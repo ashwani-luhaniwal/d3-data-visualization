@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Classed</title>
+        <style>
+            .error {
+                color: red;
+            }
+        </style>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+        <p>Error:</p>
+
+        <script type="text/javascript">
+            // d3.selection.classed() method to set class attribute or modify classList property to 
+            // selected elements.
+            d3.select('p').classed('error', true);
+        </script>
+    </body>
+</html>
