@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 SelectAll Method</title>
+        <style type="text/css">
+            .myclass {
+                color: 'red';
+            }
+        </style>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+        <p>First paragraph</p>
+        <p>Second paragraph</p>
+        <p class="myclass">Another paragraph</p>
+        <p class="myclass">Another paragraph 2</p>
+
+        <script type="text/javascript">
+            // returns all the matching elements in the HTML document based on specified CSS selector
+            d3.selectAll('p').style('color', 'green');
+
+            d3.selectAll('.myclass').style('color', 'green');
+        </script>
+    </body>
+</html>
