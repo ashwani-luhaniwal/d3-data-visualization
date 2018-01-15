@@ -1,0 +1,28 @@
+{
+  "name": "d3js-visualization-library-guide",
+  "version": "1.0.0",
+  "description": "d3.js visualization library reference guide",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ashwani-luhaniwal/d3-visualization-handbook.git"
+  },
+  "keywords": [
+    "d3.js",
+    "visualization",
+    "guide"
+  ],
+  "author": "Ashwani K Luhaniwal",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ashwani-luhaniwal/d3-visualization-handbook/issues"
+  },
+  "homepage": "https://github.com/ashwani-luhaniwal/d3-visualization-handbook#readme",
+  "dependencies": {
+    "d3": "^4.12.2",
+    "http": "0.0.0"
+  }
+}
