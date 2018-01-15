@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Add Attributes</title>
+        <style>
+            .error {
+                color: 'red';
+            }
+        </style>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+        <p>Error: This is dummy error.</p>
+
+        <script type="text/javascript">
+            // d3.selection.attr() method to apply attributes on selected DOM elements.
+            d3.select("p").attr("class", "error");
+        </script>
+    </body>
+</html>
