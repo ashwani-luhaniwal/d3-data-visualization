@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Insert Element</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+        <div>
+            <p>First paragraph</p>
+        </div>
+
+        <script type="text/javascript">
+            // d3.selection.insert() method to create a new element and insert it into selected element
+            // before its ending tag.
+            d3.select('div').insert('p').text('Second paragraph');
+        </script>
+    </body>
+</html>
