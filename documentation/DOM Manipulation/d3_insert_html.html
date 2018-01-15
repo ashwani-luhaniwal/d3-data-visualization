@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Insert InnerHTML</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+        <p>First paragraph</p>
+
+        <script type="text/javascript">
+            // d3.selection.html() method sets inner html of selected elements.
+            d3.select('p').html('<span>This was added in HTML</span>');
+        </script>
+    </body>
+</html>
