@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Property</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+        <label>D3</label><input type="checkbox" />
+        <label>jQuery</label><input type="checkbox" />
+
+        <script type="text/javascript">
+            // Attributes of some elements cannot be set by attr() method such as, checked property of 
+            // checkbox or radio button. In this case, use property() method to apply attributes on the 
+            // selected DOM elements.
+            d3.select('input').property('checked', true);
+        </script>
+    </body>
+</html>
