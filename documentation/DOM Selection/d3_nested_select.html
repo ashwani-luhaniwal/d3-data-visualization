@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Nested Select</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+        <table>
+            <tr>
+                <td>One</td>
+                <td>Two</td>
+            </tr>
+            <tr>
+                <td>Three</td>
+                <td>Four</td>
+            </tr>
+        </table>
+
+        <script type="text/javascript">
+            // select() and selectAll() methods can be used to select nested elements
+            d3.select('tr').selectAll('td').style('background-color', 'yellow');
+        </script>
+    </body>
+</html>
