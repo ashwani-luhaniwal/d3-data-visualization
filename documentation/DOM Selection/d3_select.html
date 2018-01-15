@@ -1,0 +1,44 @@
+<!-- 
+    ############################
+    Select DOM Element using D3
+    ############################
+    D3 allows us to manipulate DOM elements in the HTML document and for that we first need to select a 
+    particular element, or a group of elements and then manipulate those elements using various D3 methods.
+
+    #################
+    Global d3 Object
+    #################
+    This defines a global JavaScript object d3, which includes all the important methods to start with, 
+    just like jQuery includes a global object called jQuery (or $).
+
+    ##############
+    DOM Selection
+    ##############
+    d3.select(css-selector): Returns the first matching element in the HTML document based on specified 
+                            css-selector
+    d3.selectAll(css-selector): Returns all the matching elements in the HTML document based on specified 
+                            css-selector
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Select Method</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+        <p>First paragraph</p>
+        <p>Second paragraph</p>
+        <p id="p1">Paragraph with id</p>
+
+        <script type="text/javascript">
+            // d3.select() method returns the first element in the HTML document based on specified 
+            // css-selector
+            d3.select('p').style('color', 'green');
+
+            // Also, used to get element with specified id
+            d3.select('#p1').style('color', 'green');
+        </script>
+    </body>
+</html>
