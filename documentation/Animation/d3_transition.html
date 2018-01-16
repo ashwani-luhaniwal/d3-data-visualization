@@ -1,0 +1,49 @@
+<!-- 
+    #################
+    Animations in D3
+    #################
+    D3 simplifies the process of animations with transitions. Transitions are made on DOM selections using 
+    <selection>.transition() method. The following table lists important methods for animation in D3.
+
+    - selection.transition(): this schedules a transition for the selected elements
+    - transition.duration(): duration specifies the animation duration in milliseconds for each element
+    - transition.ease(): ease specifies the easing function, example: linear, elastic, bounce
+    - transition.delay(): delay specifies the delay in animation in milliseconds for each element
+
+    Animation is nothing but a transition from one form to another.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Transition Method</title>
+        <style>
+            #container {
+                height: 100px;
+                width: 100px;
+                background-color: black;
+            }
+        </style>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+        <div id="container"></div>
+
+        <script type="text/javascript">
+            // d3.selection.transition() method indicates the start of transition and then different
+            // transition functions can be applied to selected elements.
+            d3.select('#container')
+                .transition()
+                .duration(1000)
+                .style('background-color', 'red');
+
+            // You can also create a transition and store it in a variable. Use it to apply animations to
+            // different elements in your visualization:
+            var t = d3.transition().duration(500);
+            d3.select('#container')
+                .transition(t)
+                .style('background-color', 'red');
+        </script>
+    </body>
+</html>
