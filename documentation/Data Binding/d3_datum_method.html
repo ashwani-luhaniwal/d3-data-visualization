@@ -1,0 +1,28 @@
+<!-- 
+    #################
+    datum() method
+    #################
+    The datum() function is used for static visualization which does not need updates. It binds data 
+    directly to an element.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Datum Method</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+        <p>D3 Tutorials</p>
+
+        <script type="text/javascript">
+            d3.select('body')
+                .selectAll('p')
+                .datum(100)
+                .text(function(d, i) {
+                    return d;
+                });
+        </script>
+    </body>
+</html>
