@@ -1,0 +1,31 @@
+<!-- 
+    #################
+    Bind Loaded Data
+    #################
+    Once we have loaded our data, we have the data object available to work with.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Bind Loaded Data</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+        <p>D3 Tutorials</p>
+
+        <script type="text/javascript">
+            d3.json('/data/users.json', function(error, data) {
+                d3.select('body')
+                    .selectAll('p')
+                    .data(data)
+                    .enter()
+                    .append('p')
+                    .text(function(d) {
+                        return d.name + ', ' + d.city;
+                    });
+            });
+        </script>
+    </body>
+</html>
