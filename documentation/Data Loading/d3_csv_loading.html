@@ -1,0 +1,82 @@
+<!-- 
+    #################
+    Data Loading in D3
+    #################
+    D3 can handle different types of data defined either locally in variables or from external files.
+    D3 provides the following methods to load different types of data from external files.
+    - d3.csv(): Sends http request to the specified url to load .csv file or data and executes callback 
+                function with parsed csv data objects.
+    - d3.json(): Sends http request to the specified url to load .json file or data and executes callback 
+                 function with parsed json data objects.
+    - d3.tsv(): Sends http request to the specified url to load a .tsv file or data and executes callback 
+                function with parsed tsv data objects.
+    - d3.xml(): Sends http request to the specified url to load an .xml file or data and executes callback 
+                function with parsed xml data objects.
+
+    #########
+    d3.csv()
+    #########
+    We can load a csv file or csv data using d3.csv() method.
+
+        d3.csv(url[, row, callback]);
+
+    The first parameter is the url of .csv file, or webapi, or webservice which will return csv data. The 
+    second optional parameter is a conversion function which allows us to change the representation. The 
+    third optional parameter is a callback function which will be executed once the .csv file/data is 
+    loaded. It passes parsed data object as a parameter to callback function.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Load CSV file</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+        <p>D3 Tutorials</p>
+
+        <script type="text/javascript">
+            // here, the D3 function d3.csv() takes a file name as an input, processes the file and loads the data 
+            // into an array of objects. Note that the first row of the csv file does not get printed. This is 
+            // because the first row is treated as the column name and rest of the rows are considered as the data. 
+            // The data object loaded by d3 uses these column names as the object's properties and hence are 
+            // converted to object keys.
+            d3.csv('/data/employees.csv', function(data) {
+                for (var i = 0; i < data.length; i++) {
+                    console.log(data[i].Name);
+                    console.log(data[i].Age);
+                }
+            });
+            // d3.csv() returns the data as an object. This object is an array of objects loaded from your csv file 
+            // where each object represents one row of your csv file.
+            
+            // You can also write it as:
+            d3.csv('/data/employees.csv')
+                .get(function(data) {
+                    console.log(data);
+                });
+
+            // You can use d3.request() method of d3.csv as follows:
+            d3.request('/data/employees.csv')
+                .mimeType('text/csv')
+                .response(function(xhr) { return d3.csvParse(xhr.responseText); })
+                .get(function(data) {
+                    console.log(data);
+                });
+
+            // Use row parameter to convert representation of the data. For example, the following
+            // code changes names to upper case
+            d3.csv('/data/employees.csv')
+                .row(function(d) {
+                    return {
+                        age: d.age,
+                        name: d.name.toUpperCase()  // converting name to uppercase
+                    };
+                })
+                .get(function(data) {
+                    console.log(data);
+                });
+        </script>
+    </body>
+</html>
