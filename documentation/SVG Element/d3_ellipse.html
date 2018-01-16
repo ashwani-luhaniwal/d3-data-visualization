@@ -1,0 +1,47 @@
+<!-- 
+    ##########
+    Ellipse
+    ##########
+    Similar to the <circle> element, we have an SVG element for creating an ellipse. This is represented by 
+    <ellipse> tag.
+
+        <svg width="500" height="500">
+            <ellipse cx="250" cy="25" rx="100" ry="25"/>
+        </svg>
+
+    The ellipse takes two radii.
+    Ellipse's attributes are:
+    - cx: This is the x-coordinate of the center of the circle
+    - cy: This is the y-coordinate of the center of the circle
+    - rx: This is the x radius of the circle
+    - ry: This is the y radius of the circle
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Create Ellipse using SVG</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+
+        <script type="text/javascript">
+            var width = 500;
+            var height = 500;
+
+            // Create SVG element
+            var svg = d3.select('body')
+                        .append('svg')
+                        .attr('width', width)
+                        .attr('height', height);
+
+            // Append ellipse
+            svg.append('ellipse')
+                .attr('cx', 250)
+                .attr('cy', 50)
+                .attr('rx', 150)
+                .attr('ry', 50);
+        </script>
+    </body>
+</html>
