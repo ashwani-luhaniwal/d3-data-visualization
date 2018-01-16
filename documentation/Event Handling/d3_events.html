@@ -1,0 +1,59 @@
+<!-- 
+    #################
+    Events in D3
+    #################
+    As in all other libraries, D3 also supports built-in events and custom events. We can bind an event 
+    listener to any DOM element using d3.selection.on() method.
+
+        d3.selection.on(type[, listener[, capture]]);
+
+    The on() method adds an event listener to all selected DOM elements. The first parameter is an event 
+    type as string such as "click", "mouseover" etc. The second parameter is a callback function which will 
+    be executed when an event occurs and the third optional parameter capture flag may be specified, which 
+    corresponds to the W3C useCapture flag.
+
+    The following table lists important event handling method and objects.
+    - selection.on(): Add or remove event listeners to capture event types like click, mouseover, mouseout
+    - selection.dispatch(): Captures event types like click, mouseover, mouseout. Typenames is the 
+                            eventname, listener is the event listener
+    - d3.event: Event object to access standard event fields such as timestamp or methods like preventDefault
+    - d3.mouse(container): Gets the x and y coordinates of the current mouse position in the specified DOM 
+                           element.
+    - d3.touch(): Gets the touch coordinates to a container
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Dynamic Properties in Functions</title>
+        <style>
+            div {
+                height: 100px;
+                width: 100px;
+                background-color: steelblue;
+                margin: 5px;
+            }
+        </style>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+        <div></div>
+
+        <script type="text/javascript">
+            d3.selectAll('div')
+                .on('mouseover', function() {
+                    d3.select(this).style('background-color', 'orange');
+
+                    // Get current event info
+                    console.log(d3.event);
+
+                    // Get x & y coordinates
+                    console.log(d3.mouse(this));
+                })
+                .on('mouseout', function() {
+                    d3.select(this).style('background-color', 'steelblue');
+                });
+        </script>
+    </body>
+</html>
