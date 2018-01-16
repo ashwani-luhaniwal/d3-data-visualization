@@ -1,0 +1,42 @@
+<!-- 
+    ##########
+    Rectangle
+    ##########
+    
+    <rect x="0" y="0" width="200" height="200"></rect>
+    
+    Rectangle attributes:
+    - x: This is the x-coordinate of the top-left corner of the rectangle
+    - y: This is the y-coordinate of the top-left corner of the rectangle
+    - width: This denotes the width of the rectangle
+    - height: This denotes the height of the rectangle
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Create Rectangle using SVG</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+
+        <script type="text/javascript">
+            var width = 500;
+            var height = 500;
+
+            // Create SVG element
+            var svg = d3.select('body')
+                        .append('svg')
+                        .attr('width', width)
+                        .attr('height', height);
+
+            // Create and append rectangle element
+            svg.append('rect')
+                .attr('x', 0)
+                .attr('y', 0)
+                .attr('width', 200)
+                .attr('height', 100);
+        </script>
+    </body>
+</html>
