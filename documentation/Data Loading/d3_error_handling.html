@@ -1,0 +1,37 @@
+<!-- 
+    #################
+    Error Handling
+    #################
+    While loading data from an external source, D3 returns an argument called "error". You can use this 
+    argument to check whether your data got loaded successfully.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Error Handling</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+        <p>D3 Tutorials</p>
+
+        <script type="text/javascript">
+            d3.json('/data/users.json', function(error, data) {
+                if (error) {
+                    return console.warn(error);
+                }
+                d3.select('body')
+                    .selectAll('p')
+                    .data(data)
+                    .enter()
+                    .append('p')
+                    .text(function(d) {
+                        return d.name + ', ' + d.city;
+                    });
+            });
+            // If there is some error while loading your data, say your data is malformed; D3 will return an 
+            // error object. You can check for errors and take a decision based on this.
+        </script>
+    </body>
+</html>
