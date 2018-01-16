@@ -1,0 +1,33 @@
+<!-- 
+    #################
+    Dynamic Properties
+    #################
+    Along with manipulating DOM elements, we might want to add certain properties or attributes to our 
+    elements. Sometimes, you might want these properties to be bound to or driven by your data.
+    Function of data can be useful to setting up properties dynamically based on your data or business logic.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Dynamic Properties in Functions</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+        <p>Error: This is dummy error.</p>
+        <p>Warning: This is dummy warning.</p>
+
+        <script type="text/javascript">
+            d3.selectAll('p').style('color', function(d, i) {
+                var text = this.innerText;
+
+                if (text.indexOf('Error') >= 0) {
+                    return 'red';
+                } else if (text.indexOf('Warning') >= 0) {
+                    return 'yellow';
+                }
+            });
+        </script>
+    </body>
+</html>
