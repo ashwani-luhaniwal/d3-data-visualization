@@ -1,0 +1,64 @@
+<!-- 
+    #############################
+    Create SVG Elements using D3
+    #############################
+    SVG provides different shapes like lines, rectangles, circles, ellipses etc. Hence, designing 
+    visualizations with SVG gives you more flexibility and power in what you can achieve.
+
+    ##############
+    What is SVG ?
+    ##############
+    - SVG is an image that is text-based.
+    - SVG is similar in structure to HTML
+    - SVG sits in the DOM
+    - SVG properties can be specified as attributes
+    - SVG should have absolute positions relative to the origin (0, 0)
+
+    Each SVG element has it's own properties - which includes both geometry and style properties. All 
+    properties can be set as attributes but generally, we provide geometry properties as attributes and 
+    styling properties as styles. And since SVG sits in the DOM, we can use attr() and append() just like 
+    we did for HTML elements.
+
+    #####
+    Line
+    #####
+    An SVG line element is represented by <line> tag.
+
+        <line x1="100" y1="100" x2="500" y2="100" />
+
+    A line's attributes are:
+    - x1: This is the x-coordinate of the first point
+    - y1: This is the y-coordinate of the first point
+    - x2: This is the x-coordinate of the second point
+    - y2: This is the y-coordinate of the second point
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Create Line using SVG</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+
+        <script type="text/javascript">
+            var width = 500;
+            var height = 500;
+
+            // Create SVG element
+            var svg = d3.select('body')
+                        .append('svg')
+                        .attr('width', width)
+                        .attr('height', height);
+
+            // Create line element inside SVG
+            svg.append('line')
+                .attr('x1', 100)
+                .attr('x2', 500)
+                .attr('y1', 50)
+                .attr('y2', 50)
+                .attr('stroke', 'black');
+        </script>
+    </body>
+</html>
