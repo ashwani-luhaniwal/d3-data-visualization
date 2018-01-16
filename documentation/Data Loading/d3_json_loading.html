@@ -1,0 +1,50 @@
+<!-- 
+    #########
+    d3.json()
+    #########
+    JSON data can be a single object or an array of JSON objects.
+
+    // Single object
+        var nameObj = {
+            "name": "Ashwani",
+            "age": 30,
+            "city": "New York"
+        };
+
+    // Array of JSON objects
+        var nameArray = [{
+            "name": "Ashwani",
+            "age": 30,
+            "city": "New York"
+        }, {
+            "name": "Anil",
+            "age": 28,
+            "city": "Sans Francisco"
+        }];
+
+    JSON works in a similar way to CSV. d3.json() takes a JSON file as input and converts it into an array 
+    of objects.
+
+        d3.json(url, callback);
+
+    The first parameter is the url of .json file and second parameter is a callback function which will be 
+    executed once .json file is loaded. It passes parsed data object as a parameter to callback function.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Load JSON File</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+        <p>D3 Tutorials</p>
+
+        <script type="text/javascript">
+            d3.json('/data/users.json', function(data) {
+                console.log(data);
+            });
+        </script>
+    </body>
+</html>
