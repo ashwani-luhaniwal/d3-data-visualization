@@ -1,0 +1,40 @@
+<!-- 
+    ##########
+    Circle
+    ##########
+    
+    <circle cx="250" cy="25" r="25"/>
+
+    Circle attributes:
+    - cx: This is the x-coordinate of the center of the circle
+    - cy: This is the y-coordinate of the center of the circle
+    - r: This denotes the radius of the circle
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Create Circle using SVG</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+
+        <script type="text/javascript">
+            var width = 500;
+            var height = 500;
+
+            // Create SVG element
+            var svg = d3.select('body')
+                        .append('svg')
+                        .attr('width', width)
+                        .attr('height', height);
+
+            // Append Circle
+            svg.append('circle')
+                .attr('cx', 250)
+                .attr('cy', 50)
+                .attr('r', 50);
+        </script>
+    </body>
+</html>
