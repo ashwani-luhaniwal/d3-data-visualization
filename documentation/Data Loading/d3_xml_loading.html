@@ -1,0 +1,32 @@
+<!-- 
+    #########
+    d3.xml()
+    #########
+    
+        d3.xml(url, callback);
+    
+    d3.xml() method takes a url of xml file and returns an xml object.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Load XML File</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+        <p>D3 Tutorials</p>
+
+        <script type="text/javascript">
+            d3.xml('/data/employees.xml', function(data) {
+                console.log(data);
+            });
+
+            // You can parse and traverse the above XML as follows:
+            d3.xml('/data/employees.xml', function(data) {
+                console.log(xml.documentElement.getElementsByTagName('Name', ''));
+            });
+        </script>
+    </body>
+</html>
