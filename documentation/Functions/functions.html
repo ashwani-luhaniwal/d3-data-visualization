@@ -1,0 +1,44 @@
+<!-- 
+    #################
+    Function of Data
+    #################
+    In the DOM Manipulation chapter, we learned about different DOM manipulation methods in D3 such as 
+    append(), style(), text() etc. Each of these functions can take in a constant value or a function as 
+    a parameter. This function is a function of data. So each of these methods will be called for each of 
+    our data values bound to the DOM. Consider the following text() function.
+
+        .text(function(d) {
+            return d;
+        });
+
+    Within this function, we can apply any logic to manipulate the data. These are anonymous functions, 
+    meaning that there is no name associated with the function.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Functions of Data</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+        <p></p>
+        <p></p>
+        <p></p>
+
+        <script type="text/javascript">
+            var data = [1, 2, 3];
+            var paragraph = d3.select('body')
+                                .selectAll('p')
+                                .data(data) // data() function provides data to selected elements, here is data array
+                                .text(function(d, i) {
+                                    console.log('d: ' + d); // the data element
+                                    console.log('i: ' + i); // the index element
+                                    console.log('this: ' + this);   // the current DOM object
+
+                                    return d;
+                                });
+        </script>
+    </body>
+</html>
