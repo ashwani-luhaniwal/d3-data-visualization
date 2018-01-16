@@ -1,0 +1,62 @@
+<!-- 
+    #####################
+    Styling SVG Elements
+    #####################
+    our elements were painted with black color. This is because the default SVG color is black fill with 
+    no stroke.
+
+    - Fill: This is the fill color for your element. It can be color name, hex value, or RGB or RGBA values.
+    - stroke: This is the stroke color. Like our line example above, we can specify a color for our element.
+    - stroke-width: Stroke width specifies the width of our line or boundary. This is in pixels.
+    - opacity: Opacity will specify an opacity/transparency number. 0 is completely transparent and 1 is 
+               completely opaque.
+    - font-family: For text elements, we can specify the font-family. This works like CSS.
+    - font-size: We can also specify the font-size for text elements.
+
+    All of the above properties can be applied directly or by using CSS
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Styling SVG Elements</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+
+        <script type="text/javascript">
+            var width = 500;
+            var height = 500;
+
+            // Create SVG element
+            var svg = d3.select('body')
+                        .append('svg')
+                        .attr('width', width)
+                        .attr('height', height);
+
+            var g = svg.append('g')
+                        .attr('transform', function(d, i) {
+                            return 'translate(0, 0)';
+                        });
+
+            // Create and append ellipse element into a group
+            var ellipse = g.append('ellipse')
+                            .attr('cx', 250)
+                            .attr('cy', 50)
+                            .attr('rx', 150)
+                            .attr('ry', 50)
+                            .attr('fill', 'green')
+                            .attr('opacity', 0.5);
+
+            // Create and append text element into group
+            g.append('text')
+                .attr('x', 150)
+                .attr('y', 50)
+                .attr('stroke', 'steelblue')
+                .attr('font-family', 'sans-serif')
+                .attr('font-size', '24px') 
+                .text('This is an ellipse!');
+        </script>
+    </body>
+</html>
