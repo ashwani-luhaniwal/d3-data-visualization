@@ -1,0 +1,59 @@
+<!-- 
+    ##########
+    Text
+    ##########
+    SVG has an element to include <text> on the screen.
+
+        <svg width="500" height="500">
+            <text x="250" y="25">Your text here</text>
+        </svg>
+
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Create Text using SVG</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+
+        <script type="text/javascript">
+            var width = 500;
+            var height = 500;
+
+            // Create SVG element
+            var svg = d3.select('body')
+                        .append('svg')
+                        .attr('width', width)
+                        .attr('height', height);
+
+            // Create group element
+            // The <g> element is used when you would like to group certain SVG elements together. In our case, 
+            // we are using <g> to hold our <ellipse> and <text> elements together. The group element comes in handy 
+            // for applying transformations so that the transformations are applied to all the child elements of a 
+            // group.
+            var g = svg.append('g')
+                        .attr('transform', function(d, i) {
+                            return 'translate(0, 0)';
+                        });
+
+            // Create and append ellipse element into a group
+            var ellipse = g.append('ellipse')
+                            .attr('cx', 250)
+                            .attr('cy', 50)
+                            .attr('rx', 150)
+                            .attr('ry', 50)
+                            .append('text');
+
+            // Create and append text element into group
+            g.append('text')
+                .attr('x', 150)
+                .attr('y', 50)
+                // stroke attribute to our text so that our text is visible in white over our black ellipse
+                .attr('stroke', '#fff') 
+                .text('This is an ellipse!');
+        </script>
+    </body>
+</html>
