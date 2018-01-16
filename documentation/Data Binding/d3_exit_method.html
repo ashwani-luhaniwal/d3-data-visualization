@@ -1,0 +1,37 @@
+<!-- 
+    #################
+    exit() method
+    #################
+    While enter() is used to add new reference nodes, exit is used to remove a node.
+    
+    In the below code, all p elements will be removed. With exit(), the elements enter an exit phase. This 
+    means that all the exited elements are stored in some invisible place ready to be removed when the 
+    command is given. And that command is remove(). remove() will remove all the 'exited' nodes from the DOM.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Exit Method</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+        <p>D3 Tutorials</p>
+        <p></p>
+        <p></p>
+
+        <script type="text/javascript">
+            var myData = ["Hello World!"];
+
+            var p = d3.select('body')
+                        .selectAll('p')
+                        .data(myData)
+                        .text(function(d, i) {
+                            return d;
+                        })
+                        .exit()
+                        .remove();
+        </script>
+    </body>
+</html>
