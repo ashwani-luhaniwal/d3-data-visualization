@@ -1,0 +1,89 @@
+<!-- 
+    #################
+    Data Binding in D3
+    #################
+    D3 includes the following important methods for data binding.
+    - data(): Joins data to the selected elements
+    - enter(): Creates a selection with placeholder references for missing elements
+    - exit(): Removes nodes and adds them to the exit selection which can be later removed from the DOM
+    - datum(): Injects data to the selected element without computing a join.
+
+    ######
+    data()
+    ######
+    D3 is data driven. The data() function is used to join the specified array of data to the selected 
+    DOM elements and return the updated selection. D3 works with different types of data like Array, CSV, 
+    TSV, JSON, XML etc.
+    You can pass two types of value to the data() function, an array of values (number or object) or a 
+    function of data.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Data Method</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+        <p>D3 Tutorials</p>
+        <h1></h1>
+        <h1></h1>
+        <h1></h1>
+
+        <script type="text/javascript">
+            var myData = ["Hello World!"];
+
+            var p = d3.select('body')
+                        .selectAll('p')
+                        .data(myData)   // bind our data array 'myData' to selection returned from previous
+                        .text(function(d) {
+                            return d;   // adds data as text to each of our selection element
+                        });
+            
+            /*
+                You need to pass an array to data() function. It does not do anything if you provide a 
+                constant value
+        
+                    var myData = 100;   // constant value
+                    var p = d3.select('body')
+                            .selectAll('p')
+                            .data(myData)
+                            .text(function(d, i) {
+                                return d;
+                            });
+            */
+
+            // Join data to multiple elements
+            var h1Data = ["Hello World!", "Hello D3", "Hello JavaScript"];
+            var h1 = d3.select('body')
+                        .selectAll('h1')
+                        .data(h1Data)
+                        .text(function(d, i) {
+                            return d;
+                        });
+
+            // Data Binding
+            var pData = [1, 2, 3, 4, 5];
+            var para = d3.select('body')
+                            .selectAll('p')
+                            .data(pData)
+                            .text(function(d, i) {
+                                return d;
+                            });
+            /*
+                we have replaced our data array with [1, 2, 3, 4, 5]. Just like in the previous example, we 
+                select all the paragraph elements from the body. We then bind our data to the selection and 
+                add the data as text to our paragraph selection. Notice how the text 'D3 tutorial' got 
+                replaced with the first element from our data array <p>1</p>.
+                But what happened to the rest of the data elements? When we selected our paragraph elements 
+                using .selectAll("p"), it returned only one element in the selection because we had only one 
+                paragraph element in the DOM. Hence, when we bind the data to our paragraph selection, only 
+                the first data element bound to the one available paragraph element. Rest of the data elements 
+                from the array were ignored because there were no other <p> elements.
+                To handle such scenarios, where we are not aware of the number of data elements in our 
+                dataset and DOM elements, d3 provides the enter() function.
+            */
+        </script>
+    </body>
+</html>
