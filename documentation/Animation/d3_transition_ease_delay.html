@@ -1,0 +1,59 @@
+<!-- 
+    #################
+    transition.ease
+    #################
+    The ease() function is used to specify and control the motion of the transition.
+
+    #################
+    transition.delay
+    #################
+    The delay() function sets the delay parameter for each element in the selection on which the transition 
+    is applied. The transition will start after the specified delay value.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Transition Ease and Delay Methods</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+
+        <script type="text/javascript">
+            var svg = d3.select('body')
+                        .append('svg')
+                        .attr('width', 500)
+                        .attr('height', 500);
+
+            var bar1 = svg.append('rect')
+                            .attr('fill', 'blue')
+                            .attr('x', 100)
+                            .attr('y', 20)
+                            .attr('height', 20)
+                            .attr('width', 10);
+            
+            var bar2 = svg.append('rect')
+                            .attr('fill', 'blue')
+                            .attr('x', 120)
+                            .attr('y', 20)
+                            .attr('height', 20)
+                            .attr('width', 10);
+
+            update();
+
+            function update() {
+                bar1.transition()
+                    .ease(d3.easeLinear)
+                    .duration(2000)
+                    .attr('height', 100);
+
+                bar2.transition()
+                    .ease(d3.easeLinear)
+                    .duration(2000)
+                    .delay(2000)
+                    .attr('height', 100);
+            }
+        </script>
+    </body>
+</html>
