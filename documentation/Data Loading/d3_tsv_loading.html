@@ -1,0 +1,31 @@
+<!-- 
+    #########
+    d3.tsv()
+    #########
+    
+        d3.tsv(url, callback);
+
+    D3's tsv() method takes a .tsv file as an input url and returns a data object after parsing the TSV 
+    file.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Load TSV File</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+        <p>D3 Tutorials</p>
+
+        <script type="text/javascript">
+            d3.tsv('/data/employees.tsv', function(data) {
+                for (var i = 0; i < data.length; i++) {
+                    console.log(data[i].Name);
+                    console.log(data[i].Age);
+                }
+            });
+        </script>
+    </body>
+</html>
