@@ -1,0 +1,76 @@
+<!-- 
+    #################
+    enter() method
+    #################
+    we have seen that the data() function joins one on one mapping to the selection elements (nodes) and 
+    array values. But, what if number of elements (nodes) and data values are not matching? In such cases, 
+    we cannot get our selection using only select() and selectAll() because they may either return lesser 
+    elements than your dataset, or no selections at all, if the html code is not in place.
+    
+    The enter() method dynamically creates placeholder references corresponding to the number of data 
+    values. The output of enter() can be fed to append() method and append() will create DOM elements for 
+    which there are no corresponding DOM elements on the page.
+
+    What happens if we don't use enter()? D3 will simply update the existing nodes like we saw in the 
+    earlier example. If there are no existing nodes available to bind the data to, there won't be any 
+    updates.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Enter Method</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+        <p>D3 Tutorials</p>
+
+        <script type="text/javascript">
+            var data = [4, 1, 6, 2, 8, 9];
+            var body = d3.select('body')
+                        .selectAll('span')
+                        .data(data)
+                        .enter()
+                        .append('span')
+                        .style('color', function(d) {
+                            if (d % 2 === 0) {
+                                return 'green';
+                            } else {
+                                return 'red';
+                            }
+                        })
+                        .text(function(d) {
+                            return d + " ";
+                        });
+
+            // you can specify a function instead of an array to the data() function if the previous selection 
+            // returns multiple groups (using multiple select methods). This function will be executed for each 
+            // group in the selection.
+            var matrix = [
+                [1, 2, 3, 4],
+                [5, 6, 7, 8],
+                [9, 10, 11, 12],
+                [13, 14, 15, 16]
+            ];
+            var tr = d3.select('body')
+                        .append('table')
+                        .selectAll('tr')
+                        .data(matrix)   // joins matrix array
+                        .enter()    // create placeholder for each row in the array
+                        .append('tr');  // create <tr> in each placeholder
+
+            var td = tr.selectAll('td')
+                        .data(function(d) { // joins inner array of each row
+                            console.log(d);
+                            return d;
+                        })
+                        .enter()    // create placeholders for each element in an inner array
+                        .append('td')
+                        .text(function(d) {
+                            console.log(d);
+                            return d;   // add value of each inner array as a text in <td>
+                        });
+        </script>
+    </body>
+</html>
