@@ -1,0 +1,91 @@
+<!-- 
+    ##########################
+    Create Pie Chart using D3
+    ##########################
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 create pie chart</title>
+        <style>
+            .arc text {
+                font: 10px sans-serif;
+                text-anchor: middle;
+            }
+            .arc path {
+                stroke: #ffffff;
+            }
+            .title {
+                fill: teal;
+                font-weight: bold;
+            }
+        </style>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+        <svg width="500" height="400"></svg>
+
+        <script type="text/javascript">
+
+            var svg = d3.select('svg'),
+                width = svg.attr('width'),
+                height = svg.attr('height'),
+                radius = Math.min(width, height) / 2;
+                
+            var g = svg.append('g')
+                        .attr('transform', 'translate(' + width / 2 + ', ' + height / 2 + ')');
+
+            var color = d3.scaleOrdinal(['#4daf4a', '#377eb8', '#ff7f00', '#984ea3', '#e41a1c']);
+
+            // Since we want to plot the percentage values, we have used an anonymous function to return
+            // d.percent and set it as the pie value.
+            var pie = d3.pie().value(function(d) {
+                return d.percent;
+            });
+
+            // We define our arcs for each of the pie wedges. This arc will be set to the path elements.
+            // We provide calculated radius to outerradius and innerradius is set to 0
+            var path = d3.arc()
+                        .outerRadius(radius - 10)
+                        .innerRadius(0);
+
+            // We are also showing labels for different browsers. We have this data in the 'browser'
+            // attribute in our dataset. Labels are also defined as d3.arc(). We can decide where to add 
+            // the labels in our wedges by providing radius. You can tweak the values to see where your 
+            // labels would look the best in your visualization.
+            var label = d3.arc()
+                            .outerRadius(radius)
+                            .innerRadius(radius - 80);
+
+            d3.csv('browseruse.csv', function(error, data) {
+                if (error) {
+                    throw error;
+                }
+                var arc = g.selectAll('.arc')
+                            .data(pie(data))
+                            .enter().append('g')
+                            .attr('class', 'arc');
+
+                arc.append('path')
+                    .attr('d', path)
+                    .attr('fill', function(d) { return color(d.data.browser); });
+
+                console.log(arc);
+
+                arc.append('text')
+                    .attr('transform', function(d) {
+                        return 'translate(' + label.centroid(d) + ')';
+                    })
+                    .text(function(d) { return d.data.browser; });
+            });
+
+            svg.append('g')
+                .attr('transform', 'translate(' + (width / 2 - 120) + ', ' + 20 + ')')
+                .append('text')
+                .text('Browser use statistics - Jan 2017')
+                .attr('class', 'title');
+        </script>
+    </body>
+</html>
