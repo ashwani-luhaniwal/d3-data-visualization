@@ -1,0 +1,52 @@
+<!-- 
+    ##########################
+    Axes in D3
+    ##########################
+    The axes renders human-readable reference marks for scales. Graphs have two axes: the horizontal axis 
+    or the x-axis and the vertical axis or the y-axis.
+
+    D3 provides functions to draw axes. An axis is made of lines, ticks and labels. An axis uses scale, 
+    so each axis will need to be given a scale to work with.
+    
+    D3 provides the following functions to draw axes.
+    - d3.axisTop(): Creates top horizontal axis.
+    - d3.axisRight(): Creates vertical right-oriented axis.
+    - d3.axisBottom(): Creates bottom horizontal axis.
+    - d3.axisLeft(): Creates left vertical axis.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 create x-axis</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+
+        <script type="text/javascript">
+            var width = 400,
+                height = 100,
+                data = [10, 15, 20, 25, 30];
+
+            // Append SVG
+            var svg = d3.select('body')
+                        .append('svg')
+                        .attr('width', width)
+                        .attr('height', height);
+
+            // Create scale
+            var scale = d3.scaleLinear()
+                            .domain([d3.min(data), d3.max(data)])
+                            .range([0, width - 100]);
+
+            // Add scales to x-axis
+            var x_axis = d3.axisBottom()
+                            .scale(scale);
+
+            // Append group and insert axis
+            svg.append('g')
+                .call(x_axis);
+        </script>
+    </body>
+</html>
