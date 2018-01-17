@@ -1,0 +1,62 @@
+<!-- 
+    ##########################
+    Create SVG Chart using D3
+    ##########################
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 Create Circle Chart using SVG</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+
+        <script type="text/javascript">
+            var width = 500,
+                height = 500;
+                data = [10, 15, 20, 25, 30],
+                colors = ['#ffffcc', '#c2e699', '#78c679', '#31a354', '#006837'];
+
+            var svg = d3.select('body')
+                        .append('svg')
+                        .attr('width', width)
+                        .attr('height', height);
+
+            var g = svg.selectAll('g')
+                        .data(data)
+                        .enter()
+                        .append('g')
+                        .attr('transform', function(d, i) {
+                            return 'translate(0, 0)';   // used to position your elements with respect to origin
+                        });
+
+            g.append('circle')
+                .attr('cx', function(d, i) {
+                    return i * 100 + 50;
+                })
+                .attr('cy', function(d, i) {
+                    return 100;
+                })
+                .attr('r', function(d) {
+                    return d * 1.5;
+                })
+                .attr('fill', function(d, i) {
+                    return colors[i];
+                });
+
+            g.append('text')
+                .attr('x', function(d, i) {
+                    return i * 100 + 40;
+                })
+                .attr('y', 105)
+                .attr('stroke', 'teal')
+                .attr('font-size', '12px')
+                .attr('font-family', 'sans-serif')
+                .text(function(d) {
+                    return d;
+                });
+        </script>
+    </body>
+</html>
