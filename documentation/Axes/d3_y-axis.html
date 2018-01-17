@@ -1,0 +1,43 @@
+<!-- 
+    ##########################
+    Create y-axis in D3
+    ##########################
+    
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 create y-axis</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+
+        <script type="text/javascript">
+            var width = 400,
+                height = 400,
+                data = [10, 15, 20, 25, 30];
+
+            // Append SVG
+            var svg = d3.select('body')
+                        .append('svg')
+                        .attr('width', width)
+                        .attr('height', height);
+
+            // Create scale
+            var scale = d3.scaleLinear()
+                            .domain([d3.min(data), d3.max(data)])
+                            .range([height / 2, 0]);
+
+            // Add scales to y-axis
+            var y_axis = d3.axisLeft()
+                            .scale(scale);
+
+            // Append group and insert y-axis
+            svg.append('g')
+                .attr('transform', 'translate(50, 10)')
+                .call(y_axis);
+        </script>
+    </body>
+</html>
