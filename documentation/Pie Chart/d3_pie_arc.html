@@ -1,0 +1,125 @@
+<!-- 
+    ##########################
+    Create Pie Chart using D3
+    ##########################
+    To create our pie chart visualization, we will be using the following D3 methods.
+    - SVG Path: Creates a path in SVG from the defined commands.
+    - d3.scaleOrdinal(): Creates an ordinal scale
+    - d3.pie(): Creates an pie generator
+    - d3.arc(): Creates an arc generator
+
+    #########
+    SVG Path
+    #########
+    A path element is used to create a path on the SVG. The SVG path takes commands to draw paths in SVG.
+
+        <body>
+            <svg height="210" width="400">
+                <path d="M150 0 L75 200 L225 200 Z" />
+            </svg>
+        </body>
+
+    The above code defines the following path starting from the point (150,0), creates a line from (150,0) 
+    to (75,200), another line from (75,200) to (225,200) and finally a closing path to (150,0).
+
+    ##################
+    d3.scaleOrdinal()
+    ##################
+    The d3.scaleOrdinal() constructs a new ordinal scale with an empty domain and the specified range. 
+    In an ordinal scale, the order is of utmost importance and not the difference.
+
+        <body>
+        <script>
+            var color = d3.scaleOrdinal(['#4daf4a','#377eb8','#ff7f00','#984ea3','#e41a1c']);
+            console.log(color(0))
+            console.log(color(1))
+            console.log(color(2))
+            console.log(color(3))
+            console.log(color(4))
+            console.log(color(5))
+        </script>
+        </body>
+
+    In the above example, the color variable will act as a scaling function which will return specified 
+    color for the specified index. For example, color(0) will return #4daf4a, color(1) will return #377eb8 
+    color(2) will return #ff7f00 and so on. If a value at the specified index does not exists in the 
+    specified range then it will restart from 0. i.e. range does not contain element at 5th index 
+    (index starts with 0), so it will start again from 0 and will return #4daf4a.
+
+    ########
+    d3.pie()
+    ########
+    The d3.pie() function takes in a dataset and creates handy data for us to generate a pie chart in 
+    the SVG. It calculates the start angle and end angle for each wedge of the pie chart. These start and 
+    end angles can then be used to create actual paths for the wedges in the SVG.
+
+        <script>
+            var data = [2, 4, 8, 10];
+            var pie = d3.pie();
+            console.log(pie(data));
+        </script>
+
+    In the above example, we defined a d3.pie() object and provided our data to the pie function. This 
+    function calculated certain fields for the pie chart like startAngle and endAngle along with the data 
+    values.
+
+    #########
+    d3.arc()
+    #########
+    The d3.arc() generates an arc. These are the paths that will create our pie's wedges. Arcs need an 
+    inner radius and outer radius. If the inner radius is 0, the result will be a piechart, otherwise the 
+    result will be a donut chart. We need to supply these generated arcs to our SVG path elements.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>D3 create pie chart</title>
+        <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+    </head>
+    <body>
+        <svg width="300" height="200"></svg>
+
+        <script type="text/javascript">
+            var data = [2, 4, 8, 10];
+
+            var svg = d3.select('svg'),
+                width = svg.attr('width'),
+                height = svg.attr('height'),
+                // We calculate the radius as Math.min(width, height) / 2 to ensure that our generated pie 
+                // will fit into the bounds of the SVG. For this, we choose whichever of the width and 
+                // height is the minimum value.
+                radius = Math.min(width, height) / 2,
+                g = svg.append('g').attr('transform', 'translate(' + width / 2 + ', ' + height / 2 + ')');
+
+            var color = d3.scaleOrdinal(['#4daf4a', '#377eb8', '#ff7f00', '#984ea3', '#e41a1c']);
+
+            // Generate the pie values like startAngle and endAngle
+            var pie = d3.pie();
+
+            // Generate the arcs
+            var arc = d3.arc()
+                        .innerRadius(0)
+                        .outerRadius(radius);
+
+            // Generate groups
+            // We create group elements for each of our data values. This group element will hold our
+            // individual paths or wedges
+            var arcs = g.selectAll('arc')
+                        .data(pie(data))
+                        .enter()
+                        .append('g')
+                        .attr('class', 'arc');
+
+            // Draw arc paths
+            // we add a path element for each of our wedges. We provide the arc generated earlier and
+            // fill it with a color from our color scale.
+            arcs.append('path')
+                .attr('fill', function(d, i) {
+                    return color(i);
+                })
+                .attr('d', arc);
+        </script>
+    </body>
+</html>
