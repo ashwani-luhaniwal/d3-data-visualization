@@ -1,0 +1,238 @@
+<!-- 
+    This is a multiple line graph demonstrating the addition of axis labels.
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Load json data in multiple line chart</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        .line {
+            fill: none;
+            stroke: steelblue;
+            stroke-width: 2px;
+        }
+        div.tooltip {
+            position: absolute;
+            text-align: center;
+            width: 150px;
+            height: 50px;
+            padding: 0px 5px;
+            font: 12px sans-serif;
+            background: lightsteelblue;
+            border: 0px;
+            border-radius: 4px;
+            pointer-events: none;
+            text-align: left;
+        }
+        p {
+            padding: 1px 0px;
+        }
+    </style>
+    <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+</head>
+<body>
+    
+    <script type="text/javascript">
+        // set the dimensions and margins of the graph
+        var margin = {
+            top: 20,
+            right: 20,
+            bottom: 50,
+            left: 70
+        };
+        var width = 960 - margin.left - margin.right,
+            height = 500 - margin.top - margin.bottom,
+            ifpm10 = false,
+            ifpm25 = false,
+            ifo3 = false,
+            ifno2 = false;
+
+        // parse the date / time
+        var formatDay = d3.timeFormat('%d');
+        var formatMonth = d3.timeFormat('%B');
+        var formatYear = d3.timeFormat('%Y');
+        var timeFormat = d3.timeParse('%Y-%m-%d %H:%M:%S');
+
+        // set the ranges
+        var x = d3.scaleTime().range([0, width]);
+        var y = d3.scaleLinear().range([height, 0]);
+
+        const tooltip = d3.select('#tooltip');
+        const tooltipLine = chart.append('line');
+
+        // define the pm10
+        var pm10Line = d3.line()
+            .x(function(d) { return x(d.dateTime); })
+            .y(function(d) { return y(d.pm10); });
+        // define the pm25
+        var pm25Line = d3.line()
+            .x(function(d) { return x(d.dateTime); })
+            .y(function(d) { return y(d.pm25); });
+        // define the o3
+        var o3Line = d3.line()
+            .x(function(d) { return x(d.dateTime); })
+            .y(function(d) { return y(d.o3); });
+        // define the no2
+        var no2Line = d3.line()
+            .x(function(d) { return x(d.dateTime); })
+            .y(function(d) { return y(d.no2); });
+
+        // tooltip div
+        var div = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+        // append the svg object to the body of the page
+        // appends a 'group' element to 'svg'
+        // moves the 'group' element to the top left margin
+        var svg = d3.select('body')
+            .append('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom)
+            .append('g')
+                .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
+
+        // Get the data
+        d3.json('station2.json', function(error, data) {
+            if (error) throw error;
+
+            var data = removeDuplicates(data.items, 'aqi');
+
+            // format the data
+            data.forEach(function(d) {
+                d.dateTime = timeFormat(d.time.s);
+                // console.log(Object.keys(d.iaqi));
+                if (Object.keys(d.iaqi) == 'pm10') {
+                    d.pm10 = +d.iaqi.pm10.v;
+                    ifpm10 = true;
+                }
+                if (d.iaqi.no2) {
+                    d.no2 = +d.iaqi.no2.v;
+                    ifno2 = true;
+                }
+                if (d.iaqi.o3) {
+                    d.o3 = +d.iaqi.o3.v;
+                    ifo3 = true;
+                }
+                if (d.iaqi.pm25) {
+                    d.pm25 = +d.iaqi.pm25.v;
+                    ifpm25 = true;
+                }
+            });
+
+            // Scale the range of the data
+            x.domain(d3.extent(data, function(d) { return d.dateTime; }));
+            y.domain([0, d3.max(data, function(d) { 
+                if (d.pm10) { return Math.max(d.pm10); } 
+                else if (d.pm25) { return Math.max(d.pm25); }
+                else if (d.no2) { return Math.max(d.no2); }
+                else if (d.o3) { return Math.max(d.o3); }
+                else if (d.pm10 && d.pm25) { return Math.max(d.pm10, d.pm25); }
+                else if (d.pm10 && d.pm10 && d.no2) { return Math.max(d.pm10, d.pm25, d.no2); }
+                else { return Math.max(d.pm10, d.pm25, d.no2, d.o3); }
+            })]);
+
+            // Add the pm10Line path
+            if (ifpm10) {
+                svg.append('path')
+                    .data([data])
+                    .attr('class', 'line')
+                    .attr('d', pm10Line);
+            }
+            // Add the pm25Line path
+            if (ifpm25) {
+                svg.append('path')
+                    .data([data])
+                    .attr('class', 'line')
+                    .style('stroke', 'red')
+                    .attr('d', pm25Line);
+            }
+            // Add the no2Line path
+            if (ifno2) {
+                svg.append('path')
+                    .data([data])
+                    .attr('class', 'line')
+                    .style('stroke', 'green')
+                    .attr('d', no2Line);
+            }
+            // Add the o3Line path
+            if (ifo3) {
+                svg.append('path')
+                    .data([data])
+                    .attr('class', 'line')
+                    .style('stroke', 'orange')
+                    .attr('d', o3Line);
+            }
+
+            // add the dots with tooltips
+            svg.selectAll("dot")
+                .data(data)
+                .enter().append("circle")
+                    .attr("r", 5)
+                    .attr("cx", function(d) { return x(d.dateTime); })
+                    .attr("cy", function(d) { return y(d.pm10); })
+                .on("mouseover", function(d) {
+                    div.transition()
+                        .duration(200)
+                        .style("opacity", .9);
+                div.html('<p><b>Date: </b>' + formatDay(d.dateTime) + ' ' + formatMonth(d.dateTime) + ', ' + formatYear(d.dateTime + '</p>')
+                        + '<p><b>pm10 Level: </b>' + d.pm10 + '</p>')
+                    .style("left", (d3.event.pageX) + "px")
+                    .style("top", (d3.event.pageY - 28) + "px");
+                })
+                .on("mouseout", function(d) {
+                    div.transition()
+                        .duration(500)
+                        .style("opacity", 0);
+                });
+
+            // Add the x Axis
+            svg.append('g')
+                .attr('transform', 'translate(0, ' + height + ')')
+                .call(d3.axisBottom(x).ticks(5));
+
+            // text label for the x-axis
+            /* svg.append('text')
+                .attr('transform', 'translate(' + (width / 2) + ', ' + (height + margin.top + 20) + ')')
+                .style('text-anchor', 'middle')
+                .text('Date and Time');*/
+
+            // Add the y-axis
+            svg.append('g')
+                .call(d3.axisLeft(y).ticks(5));
+
+            // text label for the y-axis
+            /*svg.append('text')
+                .attr('transform', 'rotate(-90)')
+                .attr('y', 0 - margin.left)
+                .attr('x', 0 - (height / 2))
+                .attr('dy', '1em')
+                .style('text-anchor', 'middle')
+                .text('pm10 Levels');*/
+        });
+
+        // check and remove duplicates from json object
+        function removeDuplicates(arr, key) {
+            if (!(arr instanceof Array) || key && typeof key !== 'string') {
+                return false;
+            }
+        
+            if (key && typeof key === 'string') {
+                return arr.filter((obj, index, arr) => {
+                    return arr.map(mapObj => mapObj[key]).indexOf(obj[key]) === index;
+                });
+        
+            } else {
+                return arr.filter(function(item, index, arr) {
+                    return arr.indexOf(item) == index;
+                });
+            }
+        }
+
+    </script>
+</body>
+</html>
