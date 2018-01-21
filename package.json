@@ -23,6 +23,7 @@
   "homepage": "https://github.com/ashwani-luhaniwal/d3-visualization-handbook#readme",
   "dependencies": {
     "d3": "^4.12.2",
+    "d3-time-format": "^2.1.1",
     "http": "0.0.0",
     "http-server": "^0.11.1"
   }
