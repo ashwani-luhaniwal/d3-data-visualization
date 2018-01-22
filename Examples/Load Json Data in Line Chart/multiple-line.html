@@ -28,68 +28,53 @@
             pointer-events: none;
             text-align: left;
         }
-        p {
-            padding: 1px 0px;
-        }
     </style>
     <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
 </head>
 <body>
-    
+
     <script type="text/javascript">
         // set the dimensions and margins of the graph
-        var margin = {
+        const margin = {
             top: 20,
-            right: 20,
-            bottom: 50,
+            right: 70,
+            bottom: 100,
             left: 70
         };
-        var width = 960 - margin.left - margin.right,
-            height = 500 - margin.top - margin.bottom,
+        let width = 700 - margin.left - margin.right,
+            height = 350 - margin.top - margin.bottom,
             ifpm10 = false,
             ifpm25 = false,
             ifo3 = false,
             ifno2 = false;
+        let dataL = 0,
+            offset = 80,
+            labels = ["pm10", "pm25", "no2", "o3"],
+            color = ['steelblue', 'red', 'green', 'orange'];
 
-        // parse the date / time
-        var formatDay = d3.timeFormat('%d');
-        var formatMonth = d3.timeFormat('%B');
-        var formatYear = d3.timeFormat('%Y');
-        var timeFormat = d3.timeParse('%Y-%m-%d %H:%M:%S');
+        let formatDay = d3.timeFormat('%d'),
+            formatMonth = d3.timeFormat('%B'),
+            formatYear = d3.timeFormat('%Y'),
+            timeFormat = d3.timeParse('%Y-%m-%d %H:%M:%S');
 
-        // set the ranges
-        var x = d3.scaleTime().range([0, width]);
-        var y = d3.scaleLinear().range([height, 0]);
+        let x = d3.scaleTime().range([0, width]);
+        let y = d3.scaleLinear().range([height, 0]);
 
-        const tooltip = d3.select('#tooltip');
-        const tooltipLine = chart.append('line');
-
-        // define the pm10
-        var pm10Line = d3.line()
-            .x(function(d) { return x(d.dateTime); })
-            .y(function(d) { return y(d.pm10); });
-        // define the pm25
-        var pm25Line = d3.line()
-            .x(function(d) { return x(d.dateTime); })
-            .y(function(d) { return y(d.pm25); });
-        // define the o3
-        var o3Line = d3.line()
-            .x(function(d) { return x(d.dateTime); })
-            .y(function(d) { return y(d.o3); });
-        // define the no2
-        var no2Line = d3.line()
-            .x(function(d) { return x(d.dateTime); })
-            .y(function(d) { return y(d.no2); });
-
-        // tooltip div
-        var div = d3.select("body").append("div")
-            .attr("class", "tooltip")
-            .style("opacity", 0);
+        let pm10Line = d3.line()
+            .x((d) => { return x(d.dateTime); })
+            .y((d) => { return y(d.pm10); });
+        let pm25Line = d3.line()
+            .x((d) => { return x(d.dateTime); })
+            .y((d) => { return y(d.pm25); });
+        let no2Line = d3.line()
+            .x((d) => { return x(d.dateTime); })
+            .y((d) => { return y(d.no2); });
+        let o3Line = d3.line()
+            .x((d) => { return x(d.dateTime); })
+            .y((d) => { return y(d.o3); });
 
         // append the svg object to the body of the page
-        // appends a 'group' element to 'svg'
-        // moves the 'group' element to the top left margin
-        var svg = d3.select('body')
+        let svg = d3.select('body')
             .append('svg')
                 .attr('width', width + margin.left + margin.right)
                 .attr('height', height + margin.top + margin.bottom)
@@ -97,7 +82,7 @@
                 .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
 
         // Get the data
-        d3.json('station2.json', function(error, data) {
+        d3.json('station2.json', (error, data) => {
             if (error) throw error;
 
             var data = removeDuplicates(data.items, 'aqi');
@@ -105,10 +90,13 @@
             // format the data
             data.forEach(function(d) {
                 d.dateTime = timeFormat(d.time.s);
-                // console.log(Object.keys(d.iaqi));
-                if (Object.keys(d.iaqi) == 'pm10') {
+                if (d.iaqi.pm10) {
                     d.pm10 = +d.iaqi.pm10.v;
                     ifpm10 = true;
+                }
+                if (d.iaqi.pm25) {
+                    d.pm25 = +d.iaqi.pm25.v;
+                    ifpm25 = true;
                 }
                 if (d.iaqi.no2) {
                     d.no2 = +d.iaqi.no2.v;
@@ -118,22 +106,18 @@
                     d.o3 = +d.iaqi.o3.v;
                     ifo3 = true;
                 }
-                if (d.iaqi.pm25) {
-                    d.pm25 = +d.iaqi.pm25.v;
-                    ifpm25 = true;
-                }
             });
 
             // Scale the range of the data
+            var pollutants = [];
             x.domain(d3.extent(data, function(d) { return d.dateTime; }));
             y.domain([0, d3.max(data, function(d) { 
-                if (d.pm10) { return Math.max(d.pm10); } 
-                else if (d.pm25) { return Math.max(d.pm25); }
-                else if (d.no2) { return Math.max(d.no2); }
-                else if (d.o3) { return Math.max(d.o3); }
-                else if (d.pm10 && d.pm25) { return Math.max(d.pm10, d.pm25); }
-                else if (d.pm10 && d.pm10 && d.no2) { return Math.max(d.pm10, d.pm25, d.no2); }
-                else { return Math.max(d.pm10, d.pm25, d.no2, d.o3); }
+                // console.log(d);
+                if (d.pm10) { pollutants.push(d.pm10); }
+                if (d.pm25) { pollutants.push(d.pm25); }
+                if (d.no2) { pollutants.push(d.no2); }
+                if (d.o3) { pollutants.push(d.o3); }
+                return Math.max(...pollutants);
             })]);
 
             // Add the pm10Line path
@@ -166,44 +150,89 @@
                     .attr('class', 'line')
                     .style('stroke', 'orange')
                     .attr('d', o3Line);
-            }
+            }           
 
             // add the dots with tooltips
-            svg.selectAll("dot")
+            /*svg.selectAll("dot")
                 .data(data)
                 .enter().append("circle")
                     .attr("r", 5)
                     .attr("cx", function(d) { return x(d.dateTime); })
-                    .attr("cy", function(d) { return y(d.pm10); })
+                    .attr("cy", function(d) { 
+                        if (d.pm10) { return y(d.pm10); }
+                        if (d.pm25) { return y(d.pm25); }
+                        if (d.no2) { return y(d.no2); }
+                        if (d.o3) { return y(d.o3); }
+                    })
                 .on("mouseover", function(d) {
                     div.transition()
                         .duration(200)
                         .style("opacity", .9);
-                div.html('<p><b>Date: </b>' + formatDay(d.dateTime) + ' ' + formatMonth(d.dateTime) + ', ' + formatYear(d.dateTime + '</p>')
-                        + '<p><b>pm10 Level: </b>' + d.pm10 + '</p>')
-                    .style("left", (d3.event.pageX) + "px")
-                    .style("top", (d3.event.pageY - 28) + "px");
+                    div.html('<p><b>Date: </b>' + formatDay(d.dateTime) + ' ' + formatMonth(d.dateTime) + ', ' + formatYear(d.dateTime) + '</p>'
+                        )
+                        .style("left", (d3.event.pageX) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px");
                 })
                 .on("mouseout", function(d) {
                     div.transition()
                         .duration(500)
                         .style("opacity", 0);
-                });
+                });*/
 
             // Add the x Axis
             svg.append('g')
                 .attr('transform', 'translate(0, ' + height + ')')
                 .call(d3.axisBottom(x).ticks(5));
 
+                var svgLegned4 = d3.select(".legend4").append("svg")
+            .attr("width", width)
+            .attr("height", height - 50)
+        
+
+            var legend = svg.selectAll('.legends')
+                .data(labels)
+                .enter().append('g')
+                .attr("class", "legends")
+                .attr("transform", function (d, i) {
+                    if (i === 0) {
+                        dataL = d.length + offset;
+                        return 'translate(10,' + (height + margin.top + 10) + ')';
+                    } else { 
+                        var newdataL = dataL;
+                        dataL +=  d.length + offset;
+                        return 'translate(' + (newdataL) + ', ' + (height + margin.top + 10) + ')';
+                    }
+                });
+
+            legend.append('rect')
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", 10)
+                .attr("height", 10)
+                .style("fill", function (d, i) {
+                    return color[i];
+                });
+        
+            legend.append('text')
+                .attr("x", 20)
+                .attr("y", 10)
+                //.attr("dy", ".35em")
+                .text(function (d, i) {
+                    return d;
+                })
+                .attr("class", "textselected")
+                .style("text-anchor", "start")
+                .style("font-size", 15);
+
             // text label for the x-axis
-            /* svg.append('text')
-                .attr('transform', 'translate(' + (width / 2) + ', ' + (height + margin.top + 20) + ')')
-                .style('text-anchor', 'middle')
-                .text('Date and Time');*/
+            /*svg.append('text')
+                .attr('transform', 'translate(' + 10 + ', ' + (height + margin.top + 20) + ')')
+                .style('text-anchor', 'start')
+                .text('pm10 stands for Particulate Matter 10 micrometers ');*/
 
             // Add the y-axis
             svg.append('g')
-                .call(d3.axisLeft(y).ticks(5));
+                .call(d3.axisLeft(y));
 
             // text label for the y-axis
             /*svg.append('text')
@@ -220,19 +249,17 @@
             if (!(arr instanceof Array) || key && typeof key !== 'string') {
                 return false;
             }
-        
             if (key && typeof key === 'string') {
                 return arr.filter((obj, index, arr) => {
                     return arr.map(mapObj => mapObj[key]).indexOf(obj[key]) === index;
                 });
-        
             } else {
                 return arr.filter(function(item, index, arr) {
                     return arr.indexOf(item) == index;
                 });
             }
         }
-
+        
     </script>
 </body>
 </html>
