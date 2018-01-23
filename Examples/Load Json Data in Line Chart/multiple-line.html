@@ -81,6 +81,10 @@
             .append('g')
                 .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
 
+        var div = d3.select("body").append("div")   
+            .attr("class", "tooltip")               
+            .style("opacity", 0);
+
         // Get the data
         d3.json('station2.json', (error, data) => {
             if (error) throw error;
