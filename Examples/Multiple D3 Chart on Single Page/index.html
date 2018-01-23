@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Air Quality D3 Chart (Updated Version)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="bootstrap.min.css"/>
+    <style type="text/css">
+        .line { fill: none; stroke: steelblue; stroke-width: 2px; }
+        div.tooltip { position: absolute; text-align: center; width: 150px; height: 60px; padding: 15px 10px; font: 12px sans-serif; background: lightsteelblue; border: 0px; border-radius: 4px; pointer-events: none; line-height: 5px; }
+    </style>
+    <script type="text/javascript" src="d3.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1 class="jumbotron">Air Quality D3 Chart</h1>
+        <div class="row">
+            <div class="col-md-8"></div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div id="pm10Chart"></div>
+                </div>
+                <div class="row">
+                    <div id="pm25Chart"></div>
+                </div>
+                <div class="row">
+                    <div id="no2Chart"></div>
+                </div>
+                <div class="row">
+                    <div id="o3Chart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        const margin = { top: 20, right: 50, bottom: 45, left: 50 };
+        const width = 400 - margin.left - margin.right,
+            height = 150 - margin.top - margin.bottom;
+        const dataL = 0,
+            offset = 80,
+            labels = ["pm10", "pm25", "no2", "o3"],
+            color = ['steelblue', 'red', 'green', 'orange'];
+
+        const formatDay = d3.timeFormat('%d'),
+            formatMonth = d3.timeFormat('%B'),
+            formatYear = d3.timeFormat('%Y'),
+            timeFormat = d3.timeParse('%Y-%m-%d %H:%M:%S');
+
+        const x = d3.scaleTime().range([0, width]);
+        const y = d3.scaleLinear().range([height, 0]);
+
+        d3.json('air-station3.json', (error, data) => {
+            if (error) throw error;
+            var data = removeDuplicates(data.items, 'aqi');
+            if (data[0].iaqi.hasOwnProperty('pm10'))
+                createChart(data, 'pm10', 'steelblue');
+            if (data[0].iaqi.hasOwnProperty('pm25'))
+                createChart(data, 'pm25', 'red');
+            if (data[0].iaqi.hasOwnProperty('no2'))
+                createChart(data, 'no2', 'green');
+            if (data[0].iaqi.hasOwnProperty('o3'))
+                createChart(data, 'o3', 'orange');
+        });
+
+        function removeDuplicates(arr, key) {
+            if (!(arr instanceof Array) || key && typeof key !== 'string')
+                return false;
+            if (key && typeof key === 'string') {
+                return arr.filter((obj, index, arr) => {
+                    return arr.map(mapObj => mapObj[key]).indexOf(obj[key]) === index;
+                });
+            } else {
+                return arr.filter((item, index, arr) => {
+                    return arr.indexOf(item) == index;
+                });
+            }
+        }
+
+        function createChart(data, id, color) {
+            let line = d3.line()
+                .x((d) => { return x(d.dateTime); })
+                .y((d) => {
+                    if (id == 'pm10') { return y(d.pm10); }
+                    else if (id == 'pm25') { return y(d.pm25); }
+                    else if (id == 'no2') { return y(d.no2); }
+                    else if (id == 'o3') { return y(d.o3); } 
+                });
+
+            let svg = d3.select('#' + id + 'Chart')
+                .append('svg')
+                    .attr('width', width + margin.left + margin.right)
+                    .attr('height', height + margin.top + margin.bottom)
+                .append('g')
+                    .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
+
+            var div = d3.select("body").append("div")   
+                .attr("class", "tooltip")               
+                .style("opacity", 0);
+
+            data.forEach(function(d) {
+                d.dateTime = timeFormat(d.time.s);
+                if (id == 'pm10') { d.pm10 = +d.iaqi.pm10.v; } 
+                else if (id == 'pm25') { d.pm25 = +d.iaqi.pm25.v; } 
+                else if (id == 'no2') { d.no2 = +d.iaqi.no2.v; } 
+                else if (id == 'o3') { d.o3 = +d.iaqi.o3.v; }
+                else { return false; }
+            });
+
+            x.domain(d3.extent(data, (d) => { return d.dateTime; }));
+            y.domain([0, d3.max(data, (d) => { 
+                if (id == 'pm10') { return d.pm10; }
+                else if (id == 'pm25') { return d.pm25; }
+                else if (id == 'no2') { return d.no2; }
+                else if (id == 'o3') { return d.o3; } 
+            })]);
+
+            svg.append('path')
+                .data([data])
+                .attr('class', 'line')
+                .style('stroke', color)
+                .attr('d', line);
+
+            if (id == 'pm10') {
+                svg.selectAll('.heading')
+                    .data([data])
+                    .enter().append('text')
+                    .attr('class', 'heading')
+                    .attr('transform', 'translate(' + (width / 2) + ', -10)')
+                    .style('text-anchor', 'middle').style('font-size', '12px').style('font-weight', 600)
+                    .text((d) => {
+                        return d[0].city.name + ' Station';
+                    });
+            }
+
+            var legend = svg.selectAll('.legends')
+                .data(labels)
+                .enter().append('g')
+                .attr("class", "legends")
+                .attr('transform', 'translate(10, ' + (height + margin.top + 10) + ')');
+            legend.append('rect')
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", 10)
+                .attr("height", 10)
+                .style("fill", color);
+            legend.append('text')
+                .attr("x", 20)
+                .attr("y", 10)
+                .text((d, i) => {
+                    if (id == 'pm10') { return 'pm10 (Particulate Matter 10 micrometers)'; }
+                    else if (id == 'pm25') { return 'pm25 (Particulate Matter 2.5 micrometers)'; }
+                    else if (id == 'no2') { return 'no2 (Nitrogen Dioxide)'; }
+                    else if (id == 'o3') { return 'o3 (Ground Level Ozone)'; } 
+                })
+                .attr("class", "textselected")
+                .style("text-anchor", "start")
+                .style("font-size", 12)
+                .style('font-weight', 400);
+
+            svg.append('g')
+                .attr('transform', 'translate(0, ' + height + ')')
+                .call(d3.axisBottom(x).ticks(3));
+
+            svg.append('g')
+                .call(d3.axisLeft(y).ticks(3));
+
+            svg.selectAll("dot")
+                .data(data)
+                .enter().append("circle")
+                .attr("r", 2.5)
+                .attr("cx", function(d) { return x(d.dateTime); })
+                .attr("cy", function(d) { 
+                    if (id == 'pm10') { return y(d.pm10); }
+                    else if (id == 'pm25') { return y(d.pm25); }
+                    else if (id == 'no2') { return y(d.no2); }
+                    else if (id == 'o3') { return y(d.o3); } 
+                })
+                .style('fill', color)
+                .on("mouseover", function(d) {
+                    if (id == 'pm10') { 
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", .9);
+                        div.html(
+                            '<p><b>Date: </b>' + formatDay(d.dateTime) + ' ' + formatMonth(d.dateTime) + ', ' + formatYear(d.dateTime) + '</p>'
+                            + '<p><b>pm10 Level: </b>' + d.pm10 + '</p>'
+                        )
+                        .style("left", (d3.event.pageX + 28) + "px")
+                        .style("top", (d3.event.pageY - 30) + "px");
+                    }
+                    else if (id == 'pm25') { 
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", .9);
+                        div.html(
+                            '<p><b>Date: </b>' + formatDay(d.dateTime) + ' ' + formatMonth(d.dateTime) + ', ' + formatYear(d.dateTime) + '</p>'
+                            + '<p><b>pm25 Level: </b>' + d.pm25 + '</p>'
+                        )
+                        .style("left", (d3.event.pageX + 28) + "px")
+                        .style("top", (d3.event.pageY - 30) + "px");
+                    }
+                    else if (id == 'no2') { 
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", .9);
+                        div.html(
+                            '<p><b>Date: </b>' + formatDay(d.dateTime) + ' ' + formatMonth(d.dateTime) + ', ' + formatYear(d.dateTime) + '</p>'
+                            + '<p><b>no2 Level: </b>' + d.no2 + '</p>'
+                        )
+                        .style("left", (d3.event.pageX + 28) + "px")
+                        .style("top", (d3.event.pageY - 30) + "px");
+                    }
+                    else if (id == 'o3') {
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", .9);
+                        div.html(
+                            '<p><b>Date: </b>' + formatDay(d.dateTime) + ' ' + formatMonth(d.dateTime) + ', ' + formatYear(d.dateTime) + '</p>'
+                            + '<p><b>o3 Level: </b>' + d.o3 + '</p>'
+                        )
+                        .style("left", (d3.event.pageX + 28) + "px")
+                        .style("top", (d3.event.pageY - 30) + "px");
+                    }
+                })
+                .on("mouseout", function(d) {
+                    div.transition()
+                        .duration(500)
+                        .style("opacity", 0);
+                });
+        }
+        
+    </script>
+</body>
+</html>
