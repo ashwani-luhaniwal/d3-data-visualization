@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/ashwani-luhaniwal/d3-visualization-handbook#readme",
   "dependencies": {
+    "bootstrap": "^4.0.0",
     "d3": "^4.12.2",
     "d3-time-format": "^2.1.1",
     "http": "0.0.0",
