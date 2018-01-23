@@ -80,6 +80,7 @@
 
         function drawTooltip() {
             const year = Math.floor((x.invert(d3.mouse(tipBox.node())[0]) + 5) / 10) * 10;
+            console.log(year);
   
             states.sort((a, b) => {
                 return b.history.find(h => h.year == year).population - a.history.find(h => h.year == year).population;
