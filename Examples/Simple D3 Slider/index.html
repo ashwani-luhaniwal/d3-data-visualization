@@ -1,0 +1,87 @@
+<!-- 
+    This is a multiple line graph demonstrating the addition of axis labels.
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Simple D3 Slider</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        .slider {
+            position: relative;
+            top: 40px;
+            left: 40px;
+        }
+        .slider-tray {
+            position: absolute;
+            width: 100%;
+            height: 6px;
+            border: solid 1px #ccc;
+            border-top-color: #aaa;
+            border-radius: 4px;
+            background-color: #f0f0f0;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+        }
+        .slider-handle {
+            position: absolute;
+            top: 3px;
+        }
+        .slider-handle-icon {
+            width: 14px;
+            height: 14px;
+            border: solid 1px #aaa;
+            position: absolute;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+            top: -7px;
+            left: -7px;
+        }
+    </style>
+    <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+</head>
+<body>
+    <div class="slider"></div>
+
+    <script type="text/javascript">
+        var width = 500;
+
+        var x = d3.scaleLinear()
+            .domain([1, 100])
+            .range([0, width])
+            .clamp(true);
+
+        var dispatch = d3.dispatch('sliderChange');
+
+        var slider = d3.select('.slider')
+            .style('width', width + 'px');
+
+        var sliderTray = slider.append('div')
+            .attr('class', 'slider-tray');
+
+        var sliderHandle = slider.append('div')
+            .attr('class', 'slider-handle');
+
+        sliderHandle.append('div')
+            .attr('class', 'slider-handle-icon');
+
+        slider.call(
+            d3.drag()
+            .on('drag', () => {
+                dispatch.sliderChange(x.invert(d3.mouse(sliderTray.node())[0]));
+                d3.event.sourceEvent.preventDefault();
+            })
+            .on('drag', () => {
+                dispatch.sliderChange(x.invert(d3.mouse(sliderTray.node())[0]));
+            })
+        );
+
+        dispatch.on('sliderChange.slider', (value) => {
+            sliderHandle.style('left', x(value) + 'px')
+        });
+    </script>
+</body>
+</html>
