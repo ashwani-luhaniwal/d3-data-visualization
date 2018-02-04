@@ -1,0 +1,80 @@
+<!-- 
+    This is a multiple line graph demonstrating the addition of axis labels.
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>D3 slider with dynamic bars</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        #slider {
+            width: 435px;
+        }
+        #sliderdiv {
+            padding-left: 40px;
+        }
+    </style>
+    <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+</head>
+<body>
+    <div id="svg"></div>
+    <div id="sliderdiv">
+        <input id="slider" type="range" min="1" max="20" step="1" value="10" />
+    </div>
+
+    <script type="text/javascript">
+        var width = 500,
+            height = 180,
+            padding = 16;
+
+        var svg = d3.select('#svg')
+            .append('svg')
+            .attr('width', width)
+            .attr('height', height);
+
+        var data = d3.range(1, 21);
+
+        var xScale = d3.scaleBand()
+            .domain(data)
+            .range([padding * 2, width - padding])
+            .padding(0.2);
+
+        var yScale = d3.scaleLinear()
+            .domain([0, d3.max(data, d => d)])
+            .range([height - padding, padding]);
+
+        var bars = svg.selectAll('.bars')
+            .data(data)
+            .enter()
+            .append('rect')
+            .attr('x', d => xScale(d))
+            .attr('width', xScale.bandwidth())
+            .attr('y', d => yScale(d))
+            .attr('height', d => height - padding - yScale(d))
+            .attr('fill', (d => d3.select('#slider').node().value == d ? 'firebrick' : 'teal'));
+
+        var xAxis = d3.axisBottom(xScale);
+        var yAxis = d3.axisLeft(yScale);
+
+        var gX = svg.append('g')
+            .attr('transform', 'translate(0, ' + (height - padding) + ')')
+            .call(xAxis);
+
+        var gY = svg.append('g')
+            .attr('transform', 'translate(' + padding * 2 + ', 0)')
+            .call(yAxis);
+
+        d3.select('#slider').on('input', function() {
+            var currentValue = this.value;
+            yScale.domain([0, currentValue * 2])
+            bars.attr('y', d => yScale(d))
+                .attr('height', d => height - padding - yScale(d))
+                .attr('fill', (d => currentValue == d ? 'firebrick' : 'teal'));
+            gY.call(yAxis);
+        });
+    </script>
+</body>
+</html>
