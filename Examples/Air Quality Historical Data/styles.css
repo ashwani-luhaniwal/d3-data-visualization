@@ -1,0 +1,116 @@
+.line { 
+    fill: none; 
+    stroke: steelblue; 
+    stroke-width: 2px; 
+}
+div.tooltip { 
+    position: absolute; 
+    text-align: center; 
+    width: 150px; 
+    height: 75px; 
+    padding: 15px 10px; 
+    font: 12px sans-serif; 
+    background: lightsteelblue; 
+    border: 0px; 
+    border-radius: 4px; 
+    pointer-events: none; 
+    line-height: 5px; 
+}
+.current-date {
+    margin: 15px auto 20px;
+    display: none;
+}
+#pm10Chart {
+    margin-top: 20px;
+}
+button {
+    background-color: #ffffff;
+    border: 1px solid #333333;
+    border-radius: 4px;
+    color: #333333;
+    padding: 2px 4px;
+    cursor: pointer;
+    display: inline-block;
+    margin-right: 8px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 10px;
+    line-height: 15px;
+    font-family: sans-serif;
+}
+button:focus {
+    outline: 0;
+}
+.active {
+    background-color: #333333;
+    color: #ffffff;
+}
+.non-active {
+    background-color: #ffffff;
+    color: #333333;
+}
+.real-historial-btns-block {
+    width: 100%;
+    margin: 15px 0px 0px;
+}
+.btn-default {
+    color: #007aff;
+    background-color: #fff;
+    border-color: #007aff;
+    margin-right: 0;
+    margin-top: .5rem;
+    padding: .1rem .1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+.activeBtn {
+    color: #fff;
+    background-color: #007aff;
+    border-color: #007aff;
+}
+.spinner {
+    margin: 100px auto;
+    width: 50px;
+    height: 40px;
+    text-align: center;
+    font-size: 10px;
+    display: none;
+}
+.spinner > div {
+    background-color: #333;
+    height: 100%;
+    width: 6px;
+    display: inline-block;
+    
+    -webkit-animation: sk-stretchdelay 1.2s infinite ease-in-out;
+    animation: sk-stretchdelay 1.2s infinite ease-in-out;
+}
+.spinner .rect2 {
+    -webkit-animation-delay: -1.1s;
+    animation-delay: -1.1s;
+}
+.spinner .rect3 {
+    -webkit-animation-delay: -1.0s;
+    animation-delay: -1.0s;
+}
+.spinner .rect4 {
+    -webkit-animation-delay: -0.9s;
+    animation-delay: -0.9s;
+}
+.spinner .rect5 {
+    -webkit-animation-delay: -0.8s;
+    animation-delay: -0.8s;
+}
+@-webkit-keyframes sk-stretchdelay {
+    0%, 40%, 100% { -webkit-transform: scaleY(0.4) }  
+    20% { -webkit-transform: scaleY(1.0) }
+}
+@keyframes sk-stretchdelay {
+    0%, 40%, 100% { 
+        transform: scaleY(0.4);
+        -webkit-transform: scaleY(0.4);
+    }  20% { 
+        transform: scaleY(1.0);
+        -webkit-transform: scaleY(1.0);
+    }
+}
