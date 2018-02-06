@@ -1,0 +1,209 @@
+<!-- 
+    This is a simple demonstration of the d3fc extent component, which provides a flexible mechanism 
+    for computing the domain of a chart. It allows you to add padding, define multiple accessors, 
+    include fixed values (e.g. ensure it includes zero), etc.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>D3FC Line Extent Example</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        .line {
+            fill: none;
+            stroke: steelblue;
+            stroke-width: 2px;
+        }
+    </style>
+    <!-- include polyfills for custom event and Symbol (for IE) -->
+    <script src="https://unpkg.com/babel-polyfill@6.26.0/dist/polyfill.js"></script>
+    <script src="https://unpkg.com/custom-event-polyfill@0.3.0/custom-event-polyfill.js"></script>
+    <script src="../../../node_modules/d3/build/d3.min.js"></script>
+    <script src="../../../node_modules/d3fc/build/d3fc.min.js"></script>
+</head>
+<body>
+    
+    <script type="text/javascript">
+        // set the dimensions and margins of the graph
+        const margin = { top: 20, right: 20, bottom: 30, left: 50 },
+            width = 960 - margin.left - margin.right,
+            height = 500 - margin.top - margin.bottom;
+
+        // parse the date / time
+        const parseTime = d3.timeParse('%d-%b-%y');
+
+        // set the ranges
+        const x = d3.scaleTime().range([0, width]);
+        const y = d3.scaleLinear().range([height, 0]);
+
+        // define the line
+        const valueline = d3.line()
+            .x((d) => { return x(d.date); })
+            .y((d) => { return y(d.close); });
+
+        // append the svg object to the body of the page
+        // appends a 'group' element to 'svg'
+        // moves the 'group' element to the top left margin
+        let svg = d3.select('body').append('svg')
+            .attr('width', width + margin.left + margin.right)
+            .attr('height', height + margin.top + margin.bottom)
+            .append('g')
+                .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
+
+        // Get the data
+        d3.csv('./data.csv', (error, data) => {
+            if (error) throw error;
+
+            // format the data
+            data.forEach((d) => {
+                d.date = parseTime(d.date);
+                d.close = +d.close;
+            });
+
+            let millisPerDay = 1000 * 60 * 60 * 24;
+
+            /*
+                ------------------
+                fc.extentLinear()
+                ------------------
+                Constructs a new linear extent calculator.
+
+                ------------------------------
+                linear.accessors([accessors])
+                ------------------------------
+                If accessors is specified, sets the array of value accessors to the specified array 
+                and returns this extent instance. The accessors are applied to each data value before 
+                computing the extent. The value returned be the accessors must be a scalar value or 
+                an array of scalar values. Defaults to an identity function (i.e. d => d). If accessors 
+                is not specified, returns the current array of value accessors, which defaults [].
+
+                ---------------------
+                linear.pad([values])
+                ---------------------
+                If values is specified, sets the amount of padding applied to the minimum and maximum 
+                values of the extent, to the specified array [minPad, maxPad] and returns this extent 
+                instance. The unit of these values is set by padUnit. If values is not specified, 
+                returns the current array of padding values, which defaults [0, 0].
+
+                ------------------------
+                linear.padUnit([value])
+                ------------------------
+                If value is specified, sets the unit of the pad values applied to minimum and maximum 
+                values and returns this extent instance. Possible values are -
+                    - 'percent' - the default behavior of applying the values as a percentage of the 
+                            extent e.g. pad values of [0.5, 0.5] would double the calculated extent.
+                    - 'domain' - the padding values specified are applied directly to the calculated 
+                            extent. If value is not specified, returns the current array of padding 
+                            unit, which defaults percent.
+
+                ---------------------------------
+                linear.symmetricalAbout([value])
+                ---------------------------------
+                If value is specified, sets the value around which the extent will be centered around 
+                and returns this extent instance. Can also be set to null to disable centering. Note 
+                this is applied before padding. If value is not specified, returns the current center 
+                value, which defaults null.
+
+                -------------------------
+                linear.include([values])
+                -------------------------
+                If values is specified, sets the array of additional values to include within the 
+                calculated extent to the specified array and returns this extent instance. This allows 
+                for always including an origin (e.g. [0]) or specifying a minimum extent to always be 
+                displayed (e.g. [10, 20]). Note included values are applied before symmetricalAbout. 
+                If values is not specified, returns the current array of included values, which 
+                defaults [].
+            */
+            let yExtent = fc.extentLinear()
+                .accessors([(d) => { return d.close; }])
+                .pad([0, 0.1])
+                .include([0]);
+
+            /*
+                ----------------
+                fc.extentDate()
+                ----------------
+                Constructs a new date extent calculator.
+
+                ----------------------------
+                date.accessors([accessors])
+                ----------------------------
+                If accessors is specified, sets the array of value accessors to the specified array 
+                and returns this extent instance. The accessors are applied to each data value before 
+                computing the extent. The value returned be the accessors must be a Date or an array 
+                of Dates. Defaults to an identity function (i.e. d => d). If accessors is not 
+                specified, returns the current array of value accessors, which defaults [].
+
+                -------------------
+                date.pad([values])
+                -------------------
+                If values is specified, sets the amount of padding applied to the minimum and maximum 
+                values of the extent, to the specified array [minPad, maxPad] and returns this extent 
+                instance. The unit of these values is set by padUnit. If values is not specified, 
+                returns the current array of padding values, which defaults [0, 0].
+
+                ----------------------
+                date.padUnit([value])
+                ----------------------
+                If value is specified, sets the unit of the pad values applied to minimum and maximum 
+                values and returns this extent instance. Possible values are -
+                    - 'percent' - the default behavior of applying the values as a percentage of the 
+                            extent e.g. pad values of [0.5, 0.5] would double the calculated extent.
+                    - 'domain' - the padding values specified in milliseconds are applied directly to 
+                            the calculated extent. If value is not specified, returns the current array 
+                            of padding unit, which defaults percent.
+
+                -------------------------------
+                date.symmetricalAbout([value])
+                -------------------------------
+                If value is specified, sets the value around which the extent will be centered around 
+                and returns this extent instance. Can also be set to null to disable centering. Note 
+                this is applied before padding. If value is not specified, returns the current center 
+                value, which defaults null.
+
+                ----------------------
+                date.inclue([values])
+                ----------------------
+                If values is specified, sets the array of additional values to include within the 
+                calculated extent to the specified array and returns this extent instance. If values 
+                is not specified, returns the current array of included values, which defaults [].
+            */
+            let xExtent = fc.extentDate()
+                .accessors([(d) => { return d.date; }])
+                .padUnit('domain')
+                .pad([millisPerDay, millisPerDay]);
+
+            // scale the range of the data
+            x.domain(xExtent(data));
+            y.domain(yExtent(data));
+
+            // add the valueline path
+            svg.append('path')
+                .data([data])
+                .attr('class', 'line')
+                .attr('d', valueline);
+
+            // add the dots
+            svg.selectAll('dot')
+                .data(data)
+                .enter()
+                .append('circle')
+                    .attr('r', 5)
+                    .attr('cx', (d) => { return x(d.date); })
+                    .attr('cy', (d) => { return y(d.close); });
+
+            // add the X Axis
+            svg.append('g')
+                .attr('transform', 'translate(0, ' + height + ')')
+                .call(d3.axisBottom(x));
+
+            // add the Y Axis
+            svg.append('g')
+                .call(d3.axisLeft(y));
+        });
+    </script>
+</body>
+</html>
