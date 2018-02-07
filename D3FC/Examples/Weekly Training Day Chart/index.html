@@ -1,0 +1,141 @@
+<!-- 
+    This charts shows the average number of training days for around 1,000 London Marathon 2016 
+    finishers as obtained from strava athletes data. The data is rendered using a combination of d3 
+    and d3fc components.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>D3FC and D3 Weekly Training Days Chart</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: sans-serif;
+            font-size: 1.2em;
+        }
+        .tick {
+            font-size: 1.2em;
+        }
+        .gridline-y {
+            display: none;
+        }
+        .gridline-x {
+            opacity: 0.5;
+        }
+        #legend {
+            position: absolute;
+            top: auto;
+            bottom: 1em;
+            left: 6em;
+            width: 150px;
+            height: 120px;
+            font-size: 0.8em;
+        }
+        .y-axis-label {
+            transform: rotate(-90deg) translateY(20px) !important;
+            white-space: nowrap;
+        }
+        .point {
+            fill: inherit;
+            stroke: inherit;
+        }
+        .line {
+            stroke: inherit;
+        }
+        #container {
+            position: relative;
+        }
+        #chart {
+            height: 400px;
+        }
+    </style>
+    <!-- include polyfills for custom event and Symbol (for IE) -->
+    <script type="text/javascript" src="https://unpkg.com/babel-polyfill@6.26.0/dist/polyfill.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/custom-event-polyfill@0.3.0/custom-event-polyfill.js"></script>
+
+    <script type="text/javascript" src="../../../node_modules/d3/build/d3.min.js"></script>
+    <script type="text/javascript" src="../../../node_modules/d3fc/build/d3fc.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.18.0/d3-legend.js"></script>
+</head>
+<body>
+    <div id="container">
+        <div id="chart"></div>
+        <svg id="legend"></svg>
+    </div>
+
+    <script type="text/javascript">
+        d3.csv('./training-days.csv', (mileage) => {
+
+            let group = fc.group()
+                .orient('horizontal')
+                .key('week');
+
+            let groupedMileage = group(mileage);
+
+            let colourDomain = groupedMileage[0].map(d => d[0]);
+            let color = d3.scaleOrdinal(d3.schemeCategory10)
+                .domain(colourDomain);
+
+            let point = fc.seriesSvgPoint()
+                .size(20)
+                .crossValue((_, i) => i + 1)
+                .mainValue(d => d[1]);
+
+            let line = fc.seriesSvgLine()
+                .crossValue((_, i) => i + 1)
+                .mainValue(d => d[1]);
+
+            let pointLineSeries = fc.seriesSvgMulti()
+                .series([point, line]);
+
+            let multiLine = fc.seriesSvgRepeat()
+                .series(pointLineSeries)
+                .decorate((sel) => {
+                    sel.attr('stroke', (_, i) => color(colourDomain[i]))
+                        .attr('fill', (_, i) => color(colourDomain[i]))
+                });
+
+            let gridline = fc.annotationSvgGridline()
+                .yTicks(5);
+            let multi = fc.seriesSvgMulti()
+                .series([multiLine, gridline]);
+
+            let yExtent = fc.extentLinear()
+                .include([0])
+                .pad([0, 0.1])
+                .accessors([d => d.map(j => j[1])]);
+
+            let legend = d3.legendColor()
+                .shapeWidth(30)
+                .orient('vertical')
+                .scale(color);
+
+            d3.select('#legend')
+                .call(legend);
+
+            let extent = yExtent(groupedMileage);
+            let chart = fc.chartSvgCartesian(
+                    d3.scaleLinear(),
+                    d3.scaleLinear()
+                )
+                .xDomain([0.5, 17.5])
+                .yDomain(yExtent(groupedMileage))
+                .yOrient('left')
+                .yTicks(5)
+                .yLabel('Running days')
+                .xLabel('Week')
+                .yNice()
+                .chartLabel('Weekly training days')
+                .plotArea(multi);
+
+            d3.select('#chart')
+                .datum(groupedMileage)
+                .call(chart);
+
+        });
+    </script>
+</body>
+</html>
