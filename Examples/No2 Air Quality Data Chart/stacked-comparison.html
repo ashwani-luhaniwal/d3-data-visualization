@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Sexual assaults reported by Texas colleges</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <style>
+      body { 
+            font: 18px Helvetica Neue;
+  /*          background-color:#faf7f6;*/
+            }
+            
+      .axis path {
+            display: none;
+            }
+  
+      .axis line {
+            fill: none;
+            stroke-width: 0px;
+            shape-rendering: crispEdges;
+            }
+  
+      .axis{
+            font-size:8px;
+            }
+  
+      .group-label {
+            font-size: 9px;
+            font-weight: 400;
+            text-anchor: end;
+            }
+  
+  
+      span{
+        color:white;
+      }
+  
+      form{
+      z-index: -1;
+      }
+  
+      .numbers{
+        font-size: 8px;
+        display:none;
+        opacity:0.8;
+      }
+  
+      .number{
+        font-size: 8px;
+        display:none;
+        opacity:0.8;
+      }
+  
+      .first{
+      text-shadow: 0 0.5px 0 #fff;
+  }
+      .graphic{
+          max-width:1200px;
+      }
+  
+    </style>
+    
+  </head>
+  <body>
+  
+  <div class="graphic">
+    <h1>Sexual assaults reported by Texas colleges</h1>
+    <p class="subtext">The number of on-campus sexual assaults in Texas reported to the federal government has spiked in recent years,
+    <br>but many experts think that’s because of better reporting and awareness<br> – not necessarily an increase in crimes. 
+  </p>
+  
+    <div id="graphic">
+  
+    <!-- Add your HTML here! -->
+    <form>
+    <label><input type="radio" name="mode" value="multiples" checked> Multiples</label>
+    <label><input type="radio" name="mode" value="stacked"> Stacked</label>
+    </form>
+  
+    </div>
+  
+    
+  </div>
+  
+  <!-- build:js scripts/main.min.js -->
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  
+  <script src="main.js"></script>>
+  <!-- endbuild -->
+  </body>
+  </html>
