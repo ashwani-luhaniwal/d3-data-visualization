@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>D3 sortable and responsive table</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="styles.css"/>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font: 14px/1.4 Georgia, Serif;
+        }
+        #page-wrap {
+            margin: 50px;
+        }
+        p {
+            margin: 20px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        tr:nth-of-type(odd) {
+            background: #eee;
+        }
+        th {
+            background: #333;
+            color: white;
+            font-weight: bold;
+            cursor: s-resize;
+            background-repeat: no-repeat;
+            background-position: 3% center;
+        }
+        td, th {
+            padding: 6px;
+            border: 1px solid #cccccc;
+            text-align: left;
+        }
+        th.des:after {
+            content: '\21E9';
+        }
+        th.aes:after {
+            content: '\21E7';
+        }
+        @media only screen and (max-width: 760px), (min-device-width: 768px) and (max-device-width: 1024px) {
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            tr {
+                border: 1px solid #cccccc;
+            }
+            td {
+                border: none;
+                border-bottom: 1px solid #eeeeee;
+                position: relative;
+                padding-left: 50%;
+            }
+            td:before {
+                position: absolute;
+                top: 6px;
+                left: 6px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+            }
+            td:before {
+                content: attr(data-th) ': ';
+                font-weight: bold;
+                width: 6.5em;
+                display: inline-block;
+            }
+        }
+    </style>
+    <script type="text/javascript" src="d3.min.js"></script>
+</head>
+<body>
+    <div id="page-wrap"></div>
+    
+    <script type="text/javascript">
+        d3.csv('./2015no2.csv')
+    </script>
+</body>
+</html>
