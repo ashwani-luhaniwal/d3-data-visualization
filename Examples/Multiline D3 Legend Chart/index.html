@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>D3 Multiline Legend Chart</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type="text/css">
+        body {
+            font: 12px Arial;
+        }
+        path {
+            stroke: steelblue;
+            stroke-width: 2;
+            fill: none;
+        }
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: grey;
+            stroke-width: 1;
+            shape-rendering: crispEdges;
+        }
+        .legend {
+            font-size: 16px;
+            font-weight: bold;
+            text-anchor: middle;
+        }
+    </style>
+    <script type="text/javascript" src="../../node_modules/d3/build/d3.min.js"></script>
+</head>
+<body>
+
+    <script type="text/javascript">
+        // set the dimensions of the canvas / graph
+        let margin = { top: 30, right: 20, bottom: 70, left: 50},
+            width = 600 - margin.left - margin.right,
+            height = 300 - margin.top - margin.bottom;
+            
+        // parse the date / time
+        let parseDate = d3.timeParse('%b %Y');
+
+        // set the ranges
+        let x = d3.scaleTime().range([0, width]),
+            y = d3.scaleLinear().range([height, 0]);
+
+        // Define the line 
+        let priceline = d3.line()
+            .x((d) => { return x(d.date); })
+            .y((d) => { return y(d.price); });
+
+        // Adds the svg canvas
+        let svg = d3.select('body')
+            .append('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom)
+            .append('g')
+                .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
+
+        // Get the data
+        d3.csv('stocks.csv', (error, data) => {
+            data.forEach((d) => {
+                d.date = parseDate(d.date);
+                d.price = +d.price;
+            });
+
+            // Scale the range of the data
+            x.domain(d3.extent(data, (d) => { return d.date; }));
+            y.domain([0, d3.max(data, (d) => { return d.price; })]);
+
+            // Nest the entries by symbol
+            let dataNest = d3.nest()
+                .key((d) => { return d.symbol; })
+                .entries(data);
+
+            // set the colour scale
+            let color = d3.scaleOrdinal(d3.schemeCategory10);
+
+            legendSpace = width/dataNest.length;    // spacing for the legend
+
+            // Loop through each symbol / key
+            dataNest.forEach((d, i) => {
+                svg.append('path')
+                    .attr('class', 'line')
+                    .style('stroke', () => {    // Add the colours dynamically
+                        return d.color = color(d.key);
+                    })
+                    .attr('d', priceline(d.values));
+
+                // Add the legend
+                svg.append('text')
+                    .attr('x', (legendSpace/2) + i * legendSpace)   // space legend
+                    .attr('y', height + (margin.bottom / 2) + 5)
+                    .attr('class', 'legend')    // style the legend
+                    .style('fill', () => {  // Add the colours dynamically
+                        return d.color = color(d.key);
+                    })
+                    .text(d.key);
+            });
+
+            // add the X axis
+            svg.append('g')
+                .attr('class', 'axis')
+                .attr('transform', 'translate(0, ' + height + ')')
+                .call(d3.axisBottom(x));
+
+            // Add the Y axis
+            svg.append('g')
+                .attr('class', 'axis')
+                .call(d3.axisLeft(y));
+        });
+    </script>
+</body>
+</html>
