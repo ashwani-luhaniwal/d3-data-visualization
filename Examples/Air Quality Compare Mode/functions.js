@@ -372,3 +372,126 @@ function displayDate(d) {
     let year = new Date(d).getFullYear();
     return date + ' ' + monthNames[month] + ', ' + year;
 }
+
+function modifyCalenderDates(calenderFullDate) {
+    let month, date, year, dateString;
+    year = new Date(calenderFullDate).getFullYear();
+    if (new Date(calenderFullDate).getMonth() < 10) {
+        month= '0' + (new Date(calenderFullDate).getMonth() + 1);
+    }
+    else {
+        month = (new Date(calenderFullDate).getMonth() + 1);
+    }
+    if (new Date(calenderFullDate).getDate() < 10) {
+        date = '0' + new Date(calenderFullDate).getDate();
+    }
+    else {
+        date = new Date(calenderFullDate).getDate();
+    }
+    dateString = year + '-' + month + '-' + date;
+    return dateString;
+}
+
+function filterCSV() {
+    d3.csv('historical-data/2015/2015PM2.5.csv', (error, data) => {
+        if (error) throw error;
+
+        let fetchCompareDates, compareDatesArr, compareStartFullDate, compareEndFullDate
+        fetchCompareDates = document.getElementById('compare-daterange').value;
+        compareDatesArr = fetchCompareDates.split(' - ');
+        compareStartFullDate = compareDatesArr[0];
+        compareEndFullDate = compareDatesArr[1];
+        var startDateString = modifyCalenderDates(compareStartFullDate);
+        console.log(startDateString);
+        var endDateString = modifyCalenderDates(compareEndFullDate);
+        console.log(endDateString);
+
+        period = data.filter(function(d){
+            // console.log(d.Datum);
+            if (d.Datum >= startDateString && d.Datum <= endDateString) {
+                // console.log(d);
+            }
+            // var dateNum = +d.Datum;
+            // return startDateString <= dateNum && dateNum <= endDateString;
+        });
+        // console.log(period);
+    });
+}
+
+function comparisonData() {
+    showLoader();
+    setTimeout(() => {
+        d3.json(url + stationId + '/air_quality', (error, data) => {
+            if (error) throw error;
+
+            hideLoader();
+            d3.select('.calenderView').style('display', 'block');
+            let historicalData = removeDuplicates(data.air_quality, 'aqi');
+            
+            let fetchHistoricalDates, historicalDatesArr, historicalStartFullDate, historicalEndFullDate;
+            fetchHistoricalDates = document.getElementById('historical-daterange').value;
+            historicalDatesArr = fetchHistoricalDates.split(' - ');
+            historicalStartFullDate = historicalDatesArr[0];
+            historicalEndFullDate = historicalDatesArr[1];
+            let historicalStartDate = modifyCalenderDates(historicalStartFullDate);
+            var historicalEndDate = modifyCalenderDates(historicalEndFullDate);
+
+            let fetchCompareDates, compareDatesArr, compareStartFullDate, compareEndFullDate
+            fetchCompareDates = document.getElementById('compare-daterange').value;
+            compareDatesArr = fetchCompareDates.split(' - ');
+            compareStartFullDate = compareDatesArr[0];
+            compareEndFullDate = compareDatesArr[1];
+            let compareStartDate = modifyCalenderDates(compareStartFullDate);
+            let compareEndDate = modifyCalenderDates(compareEndFullDate);
+
+            let h = [];
+            h = historicalData.filter((d) => {
+                let dateTimeArray = d.time.s.split(' ');
+                if (dateTimeArray[0] >= historicalStartDate && dateTimeArray[0] <= historicalEndDate) {
+                    return d;
+                }
+            });
+
+            let c = [];
+            d3.csv('historical-data/2015/2015PM2.5.csv', (error, data) => {
+                if (error) throw error;
+
+                c = data.filter((d) => {
+                    let dateArray = d.Datum;
+                    if (dateArray >= compareStartDate && dateArray <= compareEndDate) {
+                        return d;
+                    }
+                });
+            });
+            console.log(c);
+
+            let weekData = d3.nest()
+                .key((d) => { 
+                    let monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                    let date = new Date(d.time.s).getDate();
+                    if (date < 10) { date = '0' + date; }
+                    let month = new Date(d.time.s).getMonth();
+                    return date + ' ' + monthNames[month];
+                })
+                .entries(historicalData);
+
+            if (h[0].iaqi.hasOwnProperty('pm10')) {
+                d3.select('svg#pm10-svg').remove();
+                // console.log(weekData[0].values);
+                createChart(h, 'pm10', 'steelblue');
+            }
+            if (h[0].iaqi.hasOwnProperty('pm25')) {
+                d3.select('svg#pm25-svg').remove();
+                createChart(h, 'pm25', 'red');
+            }   
+            if (h[0].iaqi.hasOwnProperty('no2')) {
+                d3.select('svg#no2-svg').remove();
+                createChart(h, 'no2', 'green');
+            }  
+            if (h[0].iaqi.hasOwnProperty('o3')) {
+                d3.select('svg#o3-svg').remove();
+                createChart(h, 'o3', 'orange');
+            }
+        });
+    }, 1000);
+}
