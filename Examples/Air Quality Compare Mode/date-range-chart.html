@@ -37,22 +37,25 @@
                 <div class="row">
                     <div class="col-md-12" id="data-btns">
                         <div class="btn-group real-historial-btns-block" id="btns-block" role="group">
-                            <button type="button" id="realtime-btn" class="btn btn-default btn-block activeBtn">Real-time Data</button>
-                            <button type="button" id="historial-btn" class="btn btn-default btn-block">Historial Data</button>
+                            <button type="button" id="realtime-btn" class="btn btn-default btn-block activeBtn">Real-time</button>
+                            <button type="button" id="historial-btn" class="btn btn-default btn-block">Historical</button>
+                            <button type="button" id="comparison-btn" class="btn btn-default btn-block">Comparison</button>
                         </div>
                     </div>
                 </div>
-                <div class="row calender-view">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="historical-date" class="date-label">Historial date:</label>
-                            <input class="form-control" type="text" name="historical-daterange" value="02/20/2018 - 02/28/2018" />
+                <div class="calenderView">
+                    <div class="row calender-view">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="historical-date" class="date-label">Historial date:</label>
+                                <input class="form-control" type="text" name="historical-daterange" id="historical-daterange" value="02/20/2018 - 02/28/2018" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="compare-date" class="date-label">Compare date:</label>
-                            <input class="form-control" type="text" name="compare-daterange" id="compare-daterange" value="02/20/2015 - 02/28/2015" />
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="compare-date" class="date-label">Compare date:</label>
+                                <input class="form-control" type="text" name="compare-daterange" id="compare-daterange" value="02/20/2015 - 02/28/2015" />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -79,9 +82,12 @@
         $(function() {
             $('input[name="historical-daterange"]').daterangepicker();
             $('input[name="compare-daterange"]').daterangepicker();
-            console.log(document.getElementById('compare-daterange').value);
-            var compareDateRange = document.getElementById('compare-daterange').value;
-            var 
+
+            $('input[name="historical-daterange"]').on('apply.daterangepicker', function(ev, picker) {
+                // $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+                d3.select('.calenderView').style('display', 'none');
+                comparisonData();
+            });
         });
     </script>
     <script type="text/javascript">
@@ -108,17 +114,25 @@
 
         var realtimeHistoricalData = d3.select('#btns-block').selectAll('button')
             .on('click', () => {
-                if (d3.event.target.innerText == 'Real-time Data') {
+                if (d3.event.target.innerText == 'Real-time') {
                     realTimeData();
                     d3.select('.current-date').style('display', 'none');
                     d3.select('#pm10Chart').style('margin-top', '20px');
                     d3.select('#realtime-btn').classed('activeBtn', true);
                     d3.select('#historial-btn').classed('activeBtn', false);
-                } else {
+                    d3.select('#comparison-btn').classed('activeBtn', false);
+                } else if (d3.event.target.innerText == 'Historical') {
                     historialData();
                     d3.select('#pm10Chart').style('margin-top', '0px');
                     d3.select('#realtime-btn').classed('activeBtn', false);
                     d3.select('#historial-btn').classed('activeBtn', true);
+                    d3.select('#comparison-btn').classed('activeBtn', false);
+                } else {
+                    comparisonData();
+                    d3.select('#pm10Chart').style('margin-top', '20px');
+                    d3.select('#realtime-btn').classed('activeBtn', false);
+                    d3.select('#historial-btn').classed('activeBtn', false);
+                    d3.select('#comparison-btn').classed('activeBtn', true);
                 }
             });
     </script>
