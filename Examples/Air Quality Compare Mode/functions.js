@@ -402,9 +402,7 @@ function filterCSV() {
         compareStartFullDate = compareDatesArr[0];
         compareEndFullDate = compareDatesArr[1];
         var startDateString = modifyCalenderDates(compareStartFullDate);
-        console.log(startDateString);
         var endDateString = modifyCalenderDates(compareEndFullDate);
-        console.log(endDateString);
 
         period = data.filter(function(d){
             // console.log(d.Datum);
@@ -416,6 +414,291 @@ function filterCSV() {
         });
         // console.log(period);
     });
+}
+
+function createComparisonChart(data, id, color) {
+    let line = d3.line()
+        .x((d) => { 
+            return x(d.dateTime);
+        })
+        .y((d) => {
+            // if (id == 'pm10') { return y(d.pm10); }
+            if (id == 'pm25') { 
+                return y(d.pm25);
+            }
+            // else if (id == 'no2') { return y(d.no2); }
+            // else if (id == 'o3') { return y(d.o3); } 
+        });
+
+    let line2 = d3.line()
+        .x((d) => { 
+            return x(d.dateTime);
+        })
+        .y((d) => {
+            /*if (id == 'pm10') { return y(c.pm10); }
+            else if (id == 'pm25') { return y(d.pm25); }
+            else if (id == 'no2') { return y(d.no2); }
+            else if (id == 'o3') { return y(d.o3); } */
+            if (id == 'pm25') { 
+                return y(d.Essingeleden);
+            }
+        });
+
+    let svg = d3.select('#' + id + 'Chart')
+        .append('svg')
+            .attr('width', width + margin.left + margin.right)
+            .attr('height', height + margin.top + margin.bottom)
+            .attr('id', id + '-svg')
+        .append('g')
+            .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
+
+    var div = d3.select("body").append("div")   
+        .attr("class", "tooltip")               
+        .style("opacity", 0);
+
+    let line1Array = [], line2Array = [];
+    data.forEach((d) => {
+        if (d.iaqi) {
+            line1Array.push(d);
+        }
+        else if (d.Datum) {
+            line2Array.push(d);
+        }
+    });
+    console.log(line2Array);
+
+    line1Array.forEach((d) => {
+        let timeArr = d.time.s.split(' ');
+        let dateArr = timeArr[0].split('-');
+        let newDate = dateArr[1] + '-' + dateArr[2];
+        d.dateTime = hourTimeFormat(newDate + ' ' + timeArr[1]);
+
+        if (id == 'pm25') {
+            if (d.iaqi.pm25) { d.pm25 = +d.iaqi.pm25.v; } 
+            else { d.pm25 = +0; }
+        }
+
+        line2Array.forEach((d) => {
+            let datArr = d.Datum.split('-');
+            let datTimString = datArr[1] + '-' + datArr[2];
+            d.dateTime = hourTimeFormat(datTimString + ' ' + d.Kl + ':00');
+    
+            if (id == 'pm25') {
+                if (d.Essingeleden < 0) {
+                    d.Essingeleden = +0;
+                }
+                else {
+                    d.Essingeleden = +d.Essingeleden;
+                }
+
+            }
+            
+        });
+    });
+
+    if (line1Array.length > line2Array.length) {
+        x.domain(d3.extent(line1Array, (d) => { 
+            return d.dateTime;
+        }));
+        y.domain([0, d3.max(line1Array, (d) => { 
+            // if (id == 'pm10') { return d.pm10; }
+            if (id == 'pm25') { 
+                return d.pm25;
+            }
+            // else if (id == 'no2') { return d.no2; }
+            // else if (id == 'o3') { return d.o3; } 
+        })]);
+    }
+    if (line1Array.length < line2Array.length) {
+        x.domain(d3.extent(line2Array, (d) => { 
+            console.log(d.dateTime);
+            return d.dateTime;
+        }));
+        y.domain([0, d3.max(line2Array, (d) => { 
+            // if (id == 'pm10') { return d.pm10; }
+            if (id == 'pm25') { 
+                return Math.max(d.pm25, d.Essingeleden);
+            }
+            // else if (id == 'no2') { return d.no2; }
+            // else if (id == 'o3') { return d.o3; } 
+        })]);
+    }
+
+    /*data.forEach((d) => {
+        if (d.iaqi) {
+            
+        }
+        else if (d.Datum) {
+            
+        }
+        
+        if (id == 'pm10') { 
+            if (d.iaqi.pm10) { d.pm10 = +d.iaqi.pm10.v; } 
+            else { d.pm10 = +0; }
+            c.Essingeleden = +c.Essingeleden;
+        }
+        if (id == 'pm25') {
+            if (d.iaqi) {
+                if (d.iaqi.pm25) { d.pm25 = +d.iaqi.pm25.v; } 
+                else { d.pm25 = +0; }
+            }
+            else if (d.Datum) {
+                d.Essingeleden = +d.Essingeleden;
+            }
+        } 
+        else if (id == 'no2') { 
+            if (d.iaqi.no2) { d.no2 = +d.iaqi.no2.v; } 
+            else { d.no2 = +0; }
+            c.Essingeleden = +c.Essingeleden;
+        } 
+        else if (id == 'o3') { 
+            if (d.iaqi.o3) { d.o3 = +d.iaqi.o3.v; } 
+            else { d.o3 = +0; }
+            c.Essingeleden = +c.Essingeleden;
+        } else { 
+            return false; 
+        }
+    });*/
+
+    
+
+    var sv = d3.select('svg#' + id + '-svg');
+    if (sv.empty()) {
+        drawline.data([line1Array])
+            .attr('class', 'line')
+            .style('stroke', color)
+            .attr('d', line);
+        drawline2.data([line2Array])
+            .attr('class', 'line')
+            .style('stroke', 'steelblue')
+            .attr('d', line2);
+    } else {
+        drawline = svg.append('path')
+            .data([line1Array])
+            .attr('class', 'line')
+            .style('stroke', color)
+            .attr('d', line);
+        drawline2 = svg.append('path')
+            .data([line2Array])
+            .attr('class', 'line')
+            .style('stroke', 'steelblue')
+            .attr('d', line2);
+    }
+    
+    if (id == 'pm10') {
+        svg.selectAll('.heading')
+            .data([data])
+            .enter().append('text')
+            .attr('class', 'heading')
+            .attr('transform', 'translate(' + (width / 2) + ', -10)')
+            .style('text-anchor', 'middle').style('font-size', '12px').style('font-weight', 600)
+            .text((d) => {
+                return d[0].city.name + ' Station';
+            });
+    }
+
+    /*svg.selectAll("dot")
+        .data(data)
+        .enter().append("circle")
+        .attr("r", 2.5)
+        .attr("cx", (d) => { return x(d.dateTime); })
+        .attr("cy", (d) => { 
+            if (id == 'pm10') { return y(d.pm10); }
+            else if (id == 'pm25') { return y(d.pm25); }
+            else if (id == 'no2') { return y(d.no2); }
+            else if (id == 'o3') { return y(d.o3); } 
+        })
+        .style('fill', color)
+        .on("mouseover", (d) => {
+            if (id == 'pm10') { 
+                div.transition()
+                    .duration(100)
+                    .style("opacity", 1);
+                div.html(
+                    '<p><b>pm<sub>10</sub> Level: </b>' + d.pm10 + ' ug/m<sup>3</sup></p>'
+                    + '<p><b>Time: </b>' + displayTime(d.time.s) + '</p>'
+                    + '<p><b>Date: </b>' + displayDate(d.time.s) + '</p>'
+                )
+                .style("left", (d3.event.pageX + 28) + "px")
+                .style("top", (d3.event.pageY - 30) + "px");
+            }
+            else if (id == 'pm25') { 
+                div.transition()
+                    .duration(100)
+                    .style("opacity", 1);
+                div.html(
+                    '<p><b>pm<sub>25</sub> Level: </b>' + d.pm25 + ' ug/m<sup>3</sup></p>'
+                    + '<p><b>Time: </b>' + displayTime(d.time.s) + '</p>'
+                    + '<p><b>Date: </b>' + displayDate(d.time.s) + '</p>'
+                )
+                .style("left", (d3.event.pageX + 28) + "px")
+                .style("top", (d3.event.pageY - 30) + "px");
+            }
+            else if (id == 'no2') { 
+                div.transition()
+                    .duration(100)
+                    .style("opacity", 1);
+                div.html(
+                    '<p><b>no<sub>2</sub> Level: </b>' + d.no2 + ' ug/m<sup>3</sup></p>'
+                    + '<p><b>Time: </b>' + displayTime(d.time.s) + '</p>'
+                    + '<p><b>Date: </b>' + displayDate(d.time.s) + '</p>'
+                )
+                .style("left", (d3.event.pageX + 28) + "px")
+                .style("top", (d3.event.pageY - 30) + "px");
+            }
+            else if (id == 'o3') {
+                div.transition()
+                    .duration(100)
+                    .style("opacity", 1);
+                div.html(
+                    '<p><b>o<sub>3</sub> Level: </b>' + d.o3 + ' ug/m<sup>3</sup></p>'
+                    + '<p><b>Time: </b>' + displayTime(d.time.s) + '</p>'
+                    + '<p><b>Date: </b>' + displayDate(d.time.s) + '</p>'
+                )
+                .style("left", (d3.event.pageX + 28) + "px")
+                .style("top", (d3.event.pageY - 30) + "px");
+            }
+        })
+        .on("mouseout", (d) => {
+            div.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
+
+    var legend = svg.selectAll('.legends')
+        .data(labels)
+        .enter().append('g')
+        .attr("class", "legends")
+        .attr('transform', 'translate(10, ' + (height + margin.top + 10) + ')');
+    legend.append('rect')
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", 10)
+        .attr("height", 10)
+        .style("fill", color);
+    legend.append('text')
+        .attr("x", 20)
+        .attr("y", 10)
+        .text((d, i) => {
+            if (id == 'pm10') { return 'pm10 (Particulate Matter 10 micrometers)'; }
+            else if (id == 'pm25') { return 'pm25 (Particulate Matter 2.5 micrometers)'; }
+            else if (id == 'no2') { return 'no2 (Nitrogen Dioxide)'; }
+            else if (id == 'o3') { return 'o3 (Ground Level Ozone)'; } 
+        })
+        .attr("class", "textselected")
+        .style("text-anchor", "start")
+        .style("font-size", 12)
+        .style('font-weight', 400);*/
+
+    svg.append('g')
+        .attr('transform', 'translate(0, ' + height + ')')
+        .attr('class', 'x axis')
+        .call(d3.axisBottom(x).ticks(3));
+
+    svg.append('g')
+        .attr('class', 'y axis')
+        .call(d3.axisLeft(y).ticks(3));
+    
 }
 
 function comparisonData() {
@@ -448,24 +731,22 @@ function comparisonData() {
             h = historicalData.filter((d) => {
                 let dateTimeArray = d.time.s.split(' ');
                 if (dateTimeArray[0] >= historicalStartDate && dateTimeArray[0] <= historicalEndDate) {
-                    return d;
+                    let pm25;
+                    if (d.iaqi.pm25) { 
+                        pm25 = d.iaqi.pm25.v; 
+                    } 
+                    else { 
+                        pm25 = 0; 
+                    }
+                    var t = {
+                        'Date': dateTimeArray[0],
+                        'pm25': pm25
+                    }
+                    return t;
                 }
             });
 
-            let c = [];
-            d3.csv('historical-data/2015/2015PM2.5.csv', (error, data) => {
-                if (error) throw error;
-
-                c = data.filter((d) => {
-                    let dateArray = d.Datum;
-                    if (dateArray >= compareStartDate && dateArray <= compareEndDate) {
-                        return d;
-                    }
-                });
-            });
-            console.log(c);
-
-            let weekData = d3.nest()
+            /*let weekData = d3.nest()
                 .key((d) => { 
                     let monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
                     let date = new Date(d.time.s).getDate();
@@ -473,25 +754,36 @@ function comparisonData() {
                     let month = new Date(d.time.s).getMonth();
                     return date + ' ' + monthNames[month];
                 })
-                .entries(historicalData);
+                .entries(historicalData);*/
 
-            if (h[0].iaqi.hasOwnProperty('pm10')) {
+            /*if (h[0].iaqi.hasOwnProperty('pm10')) {
                 d3.select('svg#pm10-svg').remove();
                 // console.log(weekData[0].values);
-                createChart(h, 'pm10', 'steelblue');
-            }
+                createComparisonChart(h, 'pm10', 'steelblue');
+            }*/
             if (h[0].iaqi.hasOwnProperty('pm25')) {
                 d3.select('svg#pm25-svg').remove();
-                createChart(h, 'pm25', 'red');
-            }   
-            if (h[0].iaqi.hasOwnProperty('no2')) {
+                let c = [];
+                d3.csv('historical-data/2015/2015PM2.5.csv', (error, data) => {
+                    if (error) throw error;
+
+                    c = data.filter((d) => {
+                        let dateArray = d.Datum;
+                        if (dateArray >= compareStartDate && dateArray <= compareEndDate) {
+                            return h.push(d);
+                        }
+                    });
+                    createComparisonChart(h, 'pm25', 'red');
+                });
+            }  
+            /*if (h[0].iaqi.hasOwnProperty('no2')) {
                 d3.select('svg#no2-svg').remove();
-                createChart(h, 'no2', 'green');
+                createComparisonChart(h, 'no2', 'green');
             }  
             if (h[0].iaqi.hasOwnProperty('o3')) {
                 d3.select('svg#o3-svg').remove();
-                createChart(h, 'o3', 'orange');
-            }
+                createComparisonChart(h, 'o3', 'orange');
+            }*/
         });
     }, 1000);
 }
