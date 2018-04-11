@@ -710,9 +710,224 @@ function createComparisonChart(data, historicalDays, compareDays, id, color) {
     
 }
 
+function myChart() {
+    d3.queue()
+        .defer(d3.json, url + stationId + '/air_quality')
+        .defer(d3.json, url + stationId + '/traffic')
+        .defer(d3.csv, 'historical-data/2015/2015PM10.csv')
+        .await(makeMyChart);
+}
+
+function makeMyChart(error, air_quality, traffic, historicalData) {
+    let id = 'pm10',
+        cocopuffData = [];
+
+    let airQuality = removeDuplicates(air_quality.air_quality, 'aqi');
+
+    let airQualityFilter = airQuality.filter((d) => {
+        let dateTimeArray = d.time.s.split(' ');
+        if (dateTimeArray[0] >= '2018-02-21' && dateTimeArray[0] <= '2018-02-28') {
+            return d;
+        }
+    });
+    let historicalFilter = historicalData.filter((d) => {
+        let dateArray = d.Datum;
+        if (dateArray >= '15-02-21' && dateArray <= '15-02-28') {
+            return d;
+        }
+    });
+    let trafficFilter = traffic.traffic.filter(d => {
+        if (d.created_at) {
+            let createdDate = d.created_at.split('T');
+            if (createdDate[0] >= '2018-02-21' && createdDate[0] <= '2018-02-28') {
+                return d;
+            }
+        }
+    });
+
+    cocopuffData = airQuality.filter((d) => {
+        let dateTimeArray = d.time.s.split(' ');
+        if (dateTimeArray[0] >= '2018-02-21' && dateTimeArray[0] <= '2018-02-28') {
+            return d;
+        }
+    });
+    traffic.traffic.filter(d => {
+        if (d.created_at) {
+            let createdDate = d.created_at.split('T');
+            if (createdDate[0] >= '2018-02-21' && createdDate[0] <= '2018-02-28') {
+                cocopuffData.push(d);
+            }
+        }
+    });
+    historicalData.filter((d) => {
+        let dateArray = d.Datum;
+        if (dateArray >= '15-02-21' && dateArray <= '15-02-28') {
+            cocopuffData.push(d);
+        }
+    });
+
+    let line = d3.line()
+        .x((d) => { return x(d.dateTime); })
+        .y((d) => {
+            if (id == 'pm10') { return y(d.pm10); }
+            if (id == 'pm25') { return y(d.pm25); }
+            if (id == 'no2') { return y(d.no2); }
+            if (id == 'o3') { return y(d.o3); } 
+        });
+
+    let line2 = d3.line()
+        .x((d) => { return x(d.dateTime); })
+        .y((d) => {
+            if (id == 'pm10') { return y(d.Essingeleden); }
+            if (id == 'pm25') { return y(d.Essingeleden); }
+            if (id == 'no2') { return y(d.Essingeleden); }
+            if (id == 'o3' && d.Essingeleden) { return y(d.Essingeleden); }
+        });
+
+    let line3 = d3.line()
+        .x((d) => { return x(d.dateTime); })
+        .y((d) => {
+            if (id == 'pm10') { return y(d.flowSegmentData.currentSpeed); }
+        });
+
+    let svg = d3.select('#' + id + 'Chart')
+        .append('svg')
+            .attr('width', width + margin.left + margin.right)
+            .attr('height', height + margin.top + margin.bottom)
+            .attr('id', id + '-svg')
+        .append('g')
+            .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
+
+    var div = d3.select("body").append("div")   
+        .attr("class", "tooltip")               
+        .style("opacity", 0);
+
+    airQualityFilter.forEach(d => {
+        let timeArr = d.time.s.split(' ');
+        let dateArr = timeArr[0].split('-');
+        let newDate = dateArr[1] + '-' + dateArr[2];
+        d.dateTime = hourTimeFormat(newDate + ' ' + timeArr[1]);
+
+        if (id == 'pm10') { 
+            if (d.iaqi.pm10) { d.pm10 = +d.iaqi.pm10.v; } 
+            else { d.pm10 = +0; }
+        }
+        if (id == 'pm25') {
+            if (d.iaqi.pm25) { d.pm25 = +d.iaqi.pm25.v; } 
+            else { d.pm25 = +0; }
+        }
+        if (id == 'no2') { 
+            if (d.iaqi.no2) { d.no2 = +d.iaqi.no2.v; } 
+            else { d.no2 = +0; }
+        }
+        if (id == 'o3') { 
+            if (d.iaqi.o3) { d.o3 = +d.iaqi.o3.v; } 
+            else { d.o3 = +0; }
+        }
+    });
+
+    trafficFilter.forEach(d => {
+        let timeArr = d.created_at.split('T');
+        let dateArr = timeArr[0].split('-');
+        let newDate = dateArr[1] + '-' + dateArr[2];
+        let createdTime = timeArr[1].split('.');
+        d.dateTime = hourTimeFormat(newDate + ' ' + createdTime[0]);
+
+        if (id == 'pm10' && d.flowSegmentData.currentSpeed) {
+            if (d.flowSegmentData.currentSpeed < 0) { d.Essingeleden = +0; }
+            else { d.flowSegmentData.currentSpeed = +d.flowSegmentData.currentSpeed; }
+        }
+    });
+
+    historicalFilter.forEach(d => {
+        let datArr = d.Datum.split('-');
+        let datTimString = datArr[1] + '-' + datArr[2];
+        d.dateTime = hourTimeFormat(datTimString + ' ' + d.Kl + ':00');
+
+        if (id == 'pm10' && d.Essingeleden) {
+            if (d.Essingeleden < 0) { d.Essingeleden = +0; }
+            else { d.Essingeleden = +d.Essingeleden; }
+        }
+        if (id == 'pm25' && d.Essingeleden) {
+            if (d.Essingeleden < 0) { d.Essingeleden = +0; }
+            else { d.Essingeleden = +d.Essingeleden; }
+        }
+        if (id == 'no2' && d.Essingeleden) {
+            if (d.Essingeleden < 0) { d.Essingeleden = +0; }
+            else { d.Essingeleden = +d.Essingeleden; }
+        }
+        if (id == 'o3' && d.Essingeleden) {
+            if (d.Essingeleden < 0) { d.Essingeleden = +0; }
+            else { d.Essingeleden = +d.Essingeleden; }
+        }
+    });
+
+    x.domain(d3.extent(historicalFilter, (d) => { 
+        return d.dateTime;
+    }));
+
+    y.domain([0, d3.max(cocopuffData, d => {
+        let measurementArray = [];
+        if (d.iaqi && d.pm10) {
+            measurementArray.push(d.pm10);
+        }
+        if (d.created_at && d.flowSegmentData.currentSpeed) {
+            measurementArray.push(d.flowSegmentData.currentSpeed);
+        }
+        if (d.Datum && d.Essingeleden) {
+            measurementArray.push(d.Essingeleden);
+        }
+        if (id == 'pm10') { 
+            return Math.max(...measurementArray); 
+        }
+    })]);
+
+    var sv = d3.select('svg#' + id + '-svg');
+    if (sv.empty()) {
+        drawline.data([airQualityFilter])
+            .attr('class', 'line')
+            .style('stroke', 'steelblue')
+            .attr('d', line);
+        drawline2.data([historicalFilter])
+            .attr('class', 'line')
+            .style('stroke', 'red')
+            .attr('d', line2);
+        drawline3.data([trafficFilter])
+            .attr('class', 'line')
+            .style('stroke', 'red')
+            .attr('d', line3);
+    } else {
+        drawline = svg.append('path')
+            .data([airQualityFilter])
+            .attr('class', 'line')
+            .style('stroke', 'steelblue')
+            .attr('d', line);
+        drawline2 = svg.append('path')
+            .data([historicalFilter])
+            .attr('class', 'line')
+            .style('stroke', 'red')
+            .attr('d', line2);
+        drawline3 = svg.append('path')
+            .data([trafficFilter])
+            .attr('class', 'line')
+            .style('stroke', 'green')
+            .attr('d', line3);
+    }
+
+    svg.append('g')
+        .attr('transform', 'translate(0, ' + height + ')')
+        .attr('class', 'x axis')
+        .call(d3.axisBottom(x).ticks(3));
+
+    svg.append('g')
+        .attr('class', 'y axis')
+        .call(d3.axisLeft(y).ticks(3));
+}
+
 function comparisonData() {
     showLoader();
     setTimeout(() => {
+        
         d3.json(url + stationId + '/air_quality', (error, data) => {
             if (error) throw error;
 
@@ -748,17 +963,40 @@ function comparisonData() {
                 }
             });
 
-            /*let weekData = d3.nest()
-                .key((d) => { 
-                    let monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-                    let date = new Date(d.time.s).getDate();
-                    if (date < 10) { date = '0' + date; }
-                    let month = new Date(d.time.s).getMonth();
-                    return date + ' ' + monthNames[month];
-                })
-                .entries(historicalData);*/
+            d3.json(url + stationId + '/traffic', (error, data) => {
+                if (error) throw error;
+
+                let trafficJsonData = data.traffic.reverse();
+                let trafficData = [];
+                trafficData = trafficJsonData.filter((d) => {
+                    if (d.created_at) {
+                        let dateTimeArray = d.created_at.split('T');
+                        if (dateTimeArray[0] >= historicalStartDate && dateTimeArray[0] <= historicalEndDate) {
+                            return h.push(d);
+                        }
+                    }
+                });
+            });
+
+            d3.csv('historical-data/2015/2015PM10.csv', (error, data) => {
+                if (error) throw error;
+
+                let c = [];
+                c = data.filter((d) => {
+                    let dateArray = d.Datum;
+                    if (dateArray >= compareStartDate && dateArray <= compareEndDate) {
+                        return h.push(d);
+                    }
+                });
+                console.log(h);
+                // createComparisonChart(h, historicalDiffDays, compareDiffDays, 'pm10', 'steelblue');
+            });
 
             if (h[0].iaqi.hasOwnProperty('pm10')) {
+                d3.select('svg#pm10-svg').remove();
+            }
+
+            /*if (h[0].iaqi.hasOwnProperty('pm10')) {
                 d3.select('svg#pm10-svg').remove();
                 d3.csv('historical-data/2015/2015PM10.csv', (error, data) => {
                     if (error) throw error;
@@ -816,7 +1054,7 @@ function comparisonData() {
                     });
                     createComparisonChart(h, historicalDiffDays, compareDiffDays, 'o3', 'orange');
                 });
-            }
+            }*/
         });
     }, 500);
 }
