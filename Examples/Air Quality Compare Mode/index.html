@@ -16,6 +16,7 @@
     <!-- Include Date Range Picker -->
     <script type="text/javascript" src="js/daterangepicker.js"></script>
     <script type="text/javascript" src="js/d3.min.js"></script>
+    <!-- <script src="http://d3js.org/queue.v1.min.js"></script> -->
     <script type="text/javascript" src="js/functions.js"></script>
 
 </head>
@@ -110,7 +111,7 @@
         let drawline, drawline2;
 
         const url = 'http://cocopuff.va11y.com/station/data/',
-            stationId = '5a5b9886c9310903066bfa8f';
+            stationId = '5a5b9886c9310903066bfaa4';
 
         const x = d3.scaleTime().range([0, width]);
         const y = d3.scaleLinear().range([height, 0]);
@@ -135,7 +136,8 @@
                     d3.select('#historial-btn').classed('activeBtn', true);
                     d3.select('#comparison-btn').classed('activeBtn', false);
                 } else {
-                    comparisonData();
+                    // comparisonData();
+                    myChart();
                     d3.select('.current-date').style('display', 'none');
                     d3.select('#pm10Chart').style('margin-top', '20px');
                     d3.select('#realtime-btn').classed('activeBtn', false);
