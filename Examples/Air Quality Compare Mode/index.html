@@ -12,12 +12,13 @@
 
     <!-- Include Required Prerequisites -->
     <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
     <script type="text/javascript" src="js/moment.min.js"></script>
     <!-- Include Date Range Picker -->
     <script type="text/javascript" src="js/daterangepicker.js"></script>
     <script type="text/javascript" src="js/d3.min.js"></script>
     <!-- <script src="http://d3js.org/queue.v1.min.js"></script> -->
-    <script type="text/javascript" src="js/functions.js"></script>
+    <script type="text/javascript" src="js/functions1.js"></script>
 
 </head>
 <body>
@@ -61,6 +62,14 @@
                 <div class="row">
                     <div class="current-date" id="weekdays"></div>
                 </div>
+                <!-- <div class="row">
+                    <ul id="menu_area" class="nav nav-pills">
+                        <li class="active"><a href="#knowing_us" data-toggle="tab" id="menu_text">pm2.5</a></li>
+                        <li><a href="#knowing_us2" data-toggle="tab" id="menu_text">pm10</a></li>
+                        <li><a href="#knowing_us3" data-toggle="tab" id="menu_text">no2</a></li>
+                        <li><a href="#knowing_us3" data-toggle="tab" id="menu_text">o3</a></li>                                                 
+                    </ul>
+                </div> -->
                 <div class="row">
                     <div id="pm10Chart"></div>
                 </div>
@@ -84,21 +93,21 @@
 
             $('input[name="historical-daterange"]').on('apply.daterangepicker', function(ev, picker) {
                 // $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
-                d3.select('.calenderView').style('display', 'none');
+                // d3.select('.calenderView').style('display', 'none');
                 comparisonData();
             });
 
             $('input[name="compare-daterange"]').on('apply.daterangepicker', function(ev, picker) {
                 // $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
-                d3.select('.calenderView').style('display', 'none');
+                // d3.select('.calenderView').style('display', 'none');
                 comparisonData();
             });
         });
     </script>
     <script type="text/javascript">
-        const margin = { top: 20, right: 50, bottom: 45, left: 50 },
+        const margin = { top: 20, right: 50, bottom: 70, left: 50 },
             width = 400 - margin.left - margin.right,
-            height = 150 - margin.top - margin.bottom,
+            height = 200 - margin.top - margin.bottom,
             dataL = 0,
             offset = 80,
             labels = ["pm10", "pm25", "no2", "o3"],
@@ -116,7 +125,7 @@
         const x = d3.scaleTime().range([0, width]);
         const y = d3.scaleLinear().range([height, 0]);
 
-        initialChart();
+        loadInitialChartData();
 
         var realtimeHistoricalData = d3.select('#btns-block').selectAll('button')
             .on('click', () => {
@@ -130,6 +139,7 @@
                     d3.select('#comparison-btn').classed('activeBtn', false);
                 } else if (d3.event.target.innerText == 'Historical') {
                     historialData();
+                    d3.select('.current-date').style('display', 'block');
                     d3.select('.calenderView').style('display', 'none');
                     d3.select('#pm10Chart').style('margin-top', '0px');
                     d3.select('#realtime-btn').classed('activeBtn', false);
@@ -137,7 +147,8 @@
                     d3.select('#comparison-btn').classed('activeBtn', false);
                 } else {
                     // comparisonData();
-                    myChart();
+                    comparisonData();
+                    d3.select('.calenderView').style('display', 'block');
                     d3.select('.current-date').style('display', 'none');
                     d3.select('#pm10Chart').style('margin-top', '20px');
                     d3.select('#realtime-btn').classed('activeBtn', false);
