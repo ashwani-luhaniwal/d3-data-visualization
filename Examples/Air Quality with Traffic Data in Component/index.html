@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Air Quality, Traffic and Historical Data in Component Form</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/font-awesome/font-awesome.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/daterangepicker.css" />
+    <link rel="stylesheet" type="text/css" href="css/styles.css"/>
+
+    <!-- Include Required Prerequisites -->
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/moment.min.js"></script>
+    <!-- Include Date Range Picker -->
+    <script type="text/javascript" src="js/daterangepicker.js"></script>
+    <script type="text/javascript" src="js/d3.min.js"></script>
+    <!-- <script src="http://d3js.org/queue.v1.min.js"></script> -->
+    <!-- <script type="text/javascript" src="js/functions.js"></script> -->
+    <script type="text/javascript" src="js/coco-class.js"></script>
+
+    <style>
+     
+      #panel{
+        height:100vh;
+        width:400px;
+        position: absolute;
+        top:0;
+        right:0;
+        bottom:0;
+        background:whitesmoke;
+        overflow: hidden;
+        overflow-y: auto;
+        z-index: 100;
+      }
+      #document{
+        position: absolute;
+        left:0;
+        width:calc(100vw - 400px);
+        max-height:100vh;
+        overflow: hidden;
+        overflow-y: auto;
+      }
+      #charts{
+        width:100%;
+      }
+      #charts > .chart,
+      #charts > .chart > .chartSvg {
+        box-sizing: border-box;
+        position: relative;
+        width:100%;
+        height:300px;
+      }
+    </style>
+
+</head>
+<body>
+    <div id="document" class="container-fluid">
+        <h1 class="jumbotron">Air Quality D3 Chart (Updated Version)</h1>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="spinner">
+                    <div class="rect1"></div>
+                    <div class="rect2"></div>
+                    <div class="rect3"></div>
+                    <div class="rect4"></div>
+                    <div class="rect5"></div>
+                </div>  
+                <div class="row">
+                    <div class="col-md-12" id="data-btns">
+                        <div class="btn-group real-historial-btns-block" id="btns-block" role="group">
+                            <button type="button" id="realtime-btn" class="btn btn-default btn-block activeBtn">Real-time</button>
+                            <button type="button" id="historial-btn" class="btn btn-default btn-block">Historical</button>
+                            <button type="button" id="comparison-btn" class="btn btn-default btn-block">Comparison</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="calenderView">
+                    <div class="row calender-view">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="historical-date" class="date-label">Historial date:</label>
+                                <input class="form-control" type="text" name="historical-daterange" id="historical-daterange" value="02/20/2018 - 02/28/2018" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="compare-date" class="date-label">Compare date:</label>
+                                <input class="form-control" type="text" name="compare-daterange" id="compare-daterange" value="02/20/2015 - 02/28/2015" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="current-date" id="weekdays"></div>
+                </div>
+            </div>
+            
+        </div>
+        
+    </div>
+    <div id="panel">
+        <div id="charts">
+            <div name="pm10Chart" class="chart">
+                <div label="pm10" id="pm10Chart" class="chartSvg"></div>
+            </div>
+            <div name="pm25Chart" class="chart">
+                <div label="pm25" id="pm25Chart" class="chartSvg"></div>
+            </div>
+            <div name="no2Chart" class="chart">
+                <div label="no2" id="no2Chart" class="chartSvg"></div>
+            </div>
+            <div name="o3Chart" class="chart">
+                <div label="o3" id="o3Chart" class="chartSvg"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- <script src="http://cocopuff.org/components/coco.js"></script> -->
+
+    <script>
+        const charts = Array.from(document.querySelectorAll('.chart'))
+        let chartObj;
+        for(const element of charts){
+            const chart_element = element.querySelector('.chartSvg')
+            chartObj = new CoCoCharts(chart_element);
+            chartObj.loadInitialChartData();
+        }
+        d3.select('#btns-block').selectAll('button')
+            .on('click', () => {
+                if (d3.event.target.innerText == 'Real-time') {
+                    let charts1 = Array.from(document.querySelectorAll('.chart'));
+                    for(const element of charts1){
+                        const chart_element1 = element.querySelector('.chartSvg')
+                        console.log(chart_element1);
+                        chartObj.realTimeData(chart_element1);
+                    }
+                    
+                    d3.select('.current-date').style('display', 'none');
+                    d3.select('.calenderView').style('display', 'none');
+                    d3.select('#pm10Chart').style('margin-top', '20px');
+                    d3.select('#realtime-btn').classed('activeBtn', true);
+                    d3.select('#historial-btn').classed('activeBtn', false);
+                    d3.select('#comparison-btn').classed('activeBtn', false);
+                    // d3.event.preventDefault();
+                } else if (d3.event.target.innerText == 'Historical') {
+                    for(const element of charts){
+                        const chart_element = element.querySelector('.chartSvg')
+                        console.log(chart_element);
+                        chartObj.getWeeklyData(chart_element);
+                    }
+                    // historialData();
+                    d3.select('.current-date').style('display', 'block');
+                    d3.select('.calenderView').style('display', 'none');
+                    d3.select('#pm10Chart').style('margin-top', '0px');
+                    d3.select('#realtime-btn').classed('activeBtn', false);
+                    d3.select('#historial-btn').classed('activeBtn', true);
+                    d3.select('#comparison-btn').classed('activeBtn', false);
+                } else {
+                    // comparisonData();
+                    for(const element of charts){
+                        const chart_element = element.querySelector('.chartSvg')
+                        console.log(chart_element);
+                        chartObj.createComparisonCharts(chart_element);
+                    }
+                    // comparisonData();
+                    d3.select('.calenderView').style('display', 'block');
+                    d3.select('.current-date').style('display', 'none');
+                    d3.select('#pm10Chart').style('margin-top', '20px');
+                    d3.select('#realtime-btn').classed('activeBtn', false);
+                    d3.select('#historial-btn').classed('activeBtn', false);
+                    d3.select('#comparison-btn').classed('activeBtn', true);
+                }
+            });
+    </script>
+
+    
+    <script type="text/javascript">
+        $(function() {
+            $('input[name="historical-daterange"]').daterangepicker();
+            $('input[name="compare-daterange"]').daterangepicker();
+
+            $('input[name="historical-daterange"]').on('apply.daterangepicker', function(ev, picker) {
+                // $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+                // d3.select('.calenderView').style('display', 'none');
+                comparisonData();
+            });
+
+            $('input[name="compare-daterange"]').on('apply.daterangepicker', function(ev, picker) {
+                // $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+                // d3.select('.calenderView').style('display', 'none');
+                comparisonData();
+            });
+        });
+    </script>
+    <script type="text/javascript">
+        /*const margin = { top: 20, right: 50, bottom: 70, left: 50 },
+            width = 400 - margin.left - margin.right,
+            height = 200 - margin.top - margin.bottom,
+            dataL = 0,
+            offset = 80,
+            labels = ["pm10", "pm25", "no2", "o3"],
+            color = ['steelblue', 'red', 'green', 'orange']
+            formatDay = d3.timeFormat('%d'),
+            formatMonth = d3.timeFormat('%B'),
+            formatYear = d3.timeFormat('%Y'),
+            timeFormat = d3.timeParse('%Y-%m-%d %H:%M:%S');
+            hourTimeFormat = d3.timeParse('%m-%d %H:%M:%S');
+        let drawline, drawline2;
+
+        const url = 'http://cocopuff.va11y.com/station/data/',
+            stationId = '5a5b9886c9310903066bfaa4';
+
+        const x = d3.scaleTime().range([0, width]);
+        const y = d3.scaleLinear().range([height, 0]);*/
+
+        // loadInitialChartData();
+
+        
+    </script>
+</body>
+</html>
