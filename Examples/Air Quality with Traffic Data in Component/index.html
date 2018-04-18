@@ -131,27 +131,23 @@
         d3.select('#btns-block').selectAll('button')
             .on('click', () => {
                 if (d3.event.target.innerText == 'Real-time') {
-                    let charts1 = Array.from(document.querySelectorAll('.chart'));
-                    for(const element of charts1){
-                        const chart_element1 = element.querySelector('.chartSvg')
-                        console.log(chart_element1);
-                        chartObj.realTimeData(chart_element1);
+                    let charts = Array.from(document.querySelectorAll('.chart'));
+                    for(const element of charts){
+                        const chart_element = element.querySelector('.chartSvg')
+                        realtimeChart = new CoCoCharts(chart_element);
+                        realtimeChart.loadInitialChartData();
                     }
-                    
                     d3.select('.current-date').style('display', 'none');
                     d3.select('.calenderView').style('display', 'none');
                     d3.select('#pm10Chart').style('margin-top', '20px');
                     d3.select('#realtime-btn').classed('activeBtn', true);
                     d3.select('#historial-btn').classed('activeBtn', false);
                     d3.select('#comparison-btn').classed('activeBtn', false);
-                    // d3.event.preventDefault();
                 } else if (d3.event.target.innerText == 'Historical') {
                     for(const element of charts){
                         const chart_element = element.querySelector('.chartSvg')
-                        console.log(chart_element);
                         chartObj.getWeeklyData(chart_element);
                     }
-                    // historialData();
                     d3.select('.current-date').style('display', 'block');
                     d3.select('.calenderView').style('display', 'none');
                     d3.select('#pm10Chart').style('margin-top', '0px');
@@ -159,13 +155,10 @@
                     d3.select('#historial-btn').classed('activeBtn', true);
                     d3.select('#comparison-btn').classed('activeBtn', false);
                 } else {
-                    // comparisonData();
                     for(const element of charts){
                         const chart_element = element.querySelector('.chartSvg')
-                        console.log(chart_element);
                         chartObj.createComparisonCharts(chart_element);
                     }
-                    // comparisonData();
                     d3.select('.calenderView').style('display', 'block');
                     d3.select('.current-date').style('display', 'none');
                     d3.select('#pm10Chart').style('margin-top', '20px');
@@ -174,10 +167,7 @@
                     d3.select('#comparison-btn').classed('activeBtn', true);
                 }
             });
-    </script>
 
-    
-    <script type="text/javascript">
         $(function() {
             $('input[name="historical-daterange"]').daterangepicker();
             $('input[name="compare-daterange"]').daterangepicker();
@@ -185,40 +175,23 @@
             $('input[name="historical-daterange"]').on('apply.daterangepicker', function(ev, picker) {
                 // $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
                 // d3.select('.calenderView').style('display', 'none');
-                comparisonData();
+                for(const element of charts){
+                    const chart_element = element.querySelector('.chartSvg')
+                    console.log(chart_element);
+                    chartObj.createComparisonCharts(chart_element);
+                }
             });
 
             $('input[name="compare-daterange"]').on('apply.daterangepicker', function(ev, picker) {
                 // $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
                 // d3.select('.calenderView').style('display', 'none');
-                comparisonData();
+                for(const element of charts){
+                    const chart_element = element.querySelector('.chartSvg')
+                    console.log(chart_element);
+                    chartObj.createComparisonCharts(chart_element);
+                }
             });
         });
-    </script>
-    <script type="text/javascript">
-        /*const margin = { top: 20, right: 50, bottom: 70, left: 50 },
-            width = 400 - margin.left - margin.right,
-            height = 200 - margin.top - margin.bottom,
-            dataL = 0,
-            offset = 80,
-            labels = ["pm10", "pm25", "no2", "o3"],
-            color = ['steelblue', 'red', 'green', 'orange']
-            formatDay = d3.timeFormat('%d'),
-            formatMonth = d3.timeFormat('%B'),
-            formatYear = d3.timeFormat('%Y'),
-            timeFormat = d3.timeParse('%Y-%m-%d %H:%M:%S');
-            hourTimeFormat = d3.timeParse('%m-%d %H:%M:%S');
-        let drawline, drawline2;
-
-        const url = 'http://cocopuff.va11y.com/station/data/',
-            stationId = '5a5b9886c9310903066bfaa4';
-
-        const x = d3.scaleTime().range([0, width]);
-        const y = d3.scaleLinear().range([height, 0]);*/
-
-        // loadInitialChartData();
-
-        
     </script>
 </body>
 </html>
