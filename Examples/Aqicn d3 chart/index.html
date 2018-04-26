@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Real-time Data</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="css/styles.css"/>
+    <script type="text/javascript" src="js/d3.min.js"></script>
+    <script type="text/javascript" src="js/coco-class.js"></script>
+
+    <style>
+     
+      #panel{
+        height:100vh;
+        width:400px;
+        position: absolute;
+        top:0;
+        right:0;
+        bottom:0;
+        background:whitesmoke;
+        overflow: hidden;
+        overflow-y: auto;
+        z-index: 100;
+      }
+      #document{
+        position: absolute;
+        left:0;
+        width:calc(100vw - 400px);
+        max-height:100vh;
+        overflow: hidden;
+        overflow-y: auto;
+      }
+      #charts{
+        width:100%;
+      }
+      #charts > .chartSvg {
+        box-sizing: border-box;
+        position: relative;
+        width:100%;
+        height:300px;
+      }
+    </style>
+
+</head>
+<body>
+    <div id="document" class="container-fluid">
+      <h1>Real-time Air Quality and Traffic Data</h1>
+      Enter Station Id: <input type="text" id="station" onchange="station_id_change(event)" placeholder="stationId"/>
+    </div>
+    <div id="panel">
+        <div id="charts"></div>
+    </div>
+
+    <script>
+      const chart_labels = [
+        'pm10',
+        'pm25',
+        'no2',
+        'o3',
+        'traffic'
+      ]
+      const station = document.querySelector('input#station')
+
+      const charts_container = document.querySelector('#charts')
+      const charts = chart_labels.map((label) => {
+        const element = document.createElement('div')
+        element.setAttribute('label', label)
+        element.id = `${label}Chart`
+        element.classList.add('chartSvg')
+        charts_container.appendChild(element)
+        return element
+      })
+      
+      for(const chart of charts) {
+        chart.chartObj = new CoCoCharts(chart)
+        chart.chartObj.displayChart();
+      }
+
+      function station_id_change(event) {
+        const value = event.currentTarget.value
+        for(const chart of charts){
+          chart.chartObj = new CoCoCharts(chart);
+          chart.chartObj.displayChart();
+        }
+      }
+
+    </script>
+</body>
+</html>
