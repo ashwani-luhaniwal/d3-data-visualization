@@ -5,17 +5,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Air Quality, Traffic and Historical Data in Component Form</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+    <!-- <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/font-awesome/font-awesome.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/daterangepicker.css" />
-    <link rel="stylesheet" type="text/css" href="css/styles.css"/>
+    <link rel="stylesheet" type="text/css" href="css/styles.css"/> 
 
-    <!-- Include Required Prerequisites -->
     <script type="text/javascript" src="js/jquery.min.js"></script>
     <script type="text/javascript" src="js/bootstrap.min.js"></script>
     <script type="text/javascript" src="js/moment.min.js"></script>
-    <!-- Include Date Range Picker -->
-    <script type="text/javascript" src="js/daterangepicker.js"></script>
+    <script type="text/javascript" src="js/daterangepicker.js"></script> -->
     <script type="text/javascript" src="js/d3.min.js"></script>
     <!-- <script src="http://d3js.org/queue.v1.min.js"></script> -->
     <!-- <script type="text/javascript" src="js/functions.js"></script> -->
@@ -82,13 +80,13 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="historical-date" class="date-label">Historial date:</label>
-                                <input class="form-control" type="text" name="historical-daterange" id="historical-daterange" value="02/20/2018 - 02/28/2018" />
+                                <input class="form-control historical-daterange" type="text" name="historical-daterange" id="historical-daterange" value="02/20/2018 - 02/28/2018" />
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="compare-date" class="date-label">Compare date:</label>
-                                <input class="form-control" type="text" name="compare-daterange" id="compare-daterange" value="02/20/2015 - 02/28/2015" />
+                                <input class="form-control compare-daterange" type="text" name="compare-daterange" id="compare-daterange" value="02/20/2015 - 02/28/2015" />
                             </div>
                         </div>
                     </div>
@@ -129,46 +127,68 @@
             chartObj.loadInitialChartData();
         }
         d3.select('#btns-block').selectAll('button')
-            .on('click', () => {
-                if (d3.event.target.innerText == 'Real-time') {
-                    let charts = Array.from(document.querySelectorAll('.chart'));
-                    for(const element of charts){
-                        const chart_element = element.querySelector('.chartSvg')
-                        realtimeChart = new CoCoCharts(chart_element);
-                        realtimeChart.loadInitialChartData();
-                    }
-                    d3.select('.current-date').style('display', 'none');
-                    d3.select('.calenderView').style('display', 'none');
-                    d3.select('#pm10Chart').style('margin-top', '20px');
-                    d3.select('#realtime-btn').classed('activeBtn', true);
-                    d3.select('#historial-btn').classed('activeBtn', false);
-                    d3.select('#comparison-btn').classed('activeBtn', false);
-                } else if (d3.event.target.innerText == 'Historical') {
-                    for(const element of charts){
-                        const chart_element = element.querySelector('.chartSvg')
-                        chartObj.getWeeklyData(chart_element);
-                    }
-                    d3.select('.current-date').style('display', 'block');
-                    d3.select('.calenderView').style('display', 'none');
-                    d3.select('#pm10Chart').style('margin-top', '0px');
-                    d3.select('#realtime-btn').classed('activeBtn', false);
-                    d3.select('#historial-btn').classed('activeBtn', true);
-                    d3.select('#comparison-btn').classed('activeBtn', false);
-                } else {
-                    for(const element of charts){
-                        const chart_element = element.querySelector('.chartSvg')
-                        chartObj.createComparisonCharts(chart_element);
-                    }
-                    d3.select('.calenderView').style('display', 'block');
-                    d3.select('.current-date').style('display', 'none');
-                    d3.select('#pm10Chart').style('margin-top', '20px');
-                    d3.select('#realtime-btn').classed('activeBtn', false);
-                    d3.select('#historial-btn').classed('activeBtn', false);
-                    d3.select('#comparison-btn').classed('activeBtn', true);
-                }
-            });
+          .on('click', () => {
+            if (d3.event.target.innerText == 'Real-time') {
+              let charts = Array.from(document.querySelectorAll('.chart'));
+              for(const element of charts){
+                  const chart_element = element.querySelector('.chartSvg')
+                  realtimeChart = new CoCoCharts(chart_element);
+                  realtimeChart.loadInitialChartData();
+              }
+              d3.select('.current-date').style('display', 'none');
+              d3.select('.calenderView').style('display', 'none');
+              d3.select('#pm10Chart').style('margin-top', '20px');
+              d3.select('#realtime-btn').classed('activeBtn', true);
+              d3.select('#historial-btn').classed('activeBtn', false);
+              d3.select('#comparison-btn').classed('activeBtn', false);
+            } else if (d3.event.target.innerText == 'Historical') {
+              for(const element of charts){
+                  const chart_element = element.querySelector('.chartSvg')
+                  chartObj.getWeeklyData(chart_element);
+              }
+              d3.select('.current-date').style('display', 'block');
+              d3.select('.calenderView').style('display', 'none');
+              d3.select('#pm10Chart').style('margin-top', '0px');
+              d3.select('#realtime-btn').classed('activeBtn', false);
+              d3.select('#historial-btn').classed('activeBtn', true);
+              d3.select('#comparison-btn').classed('activeBtn', false);
+            } else {
+              for(const element of charts){
+                  const chart_element = element.querySelector('.chartSvg')
+                  chartObj.createComparisonCharts(chart_element);
+              }
+              d3.select('.calenderView').style('display', 'block');
+              d3.select('.current-date').style('display', 'none');
+              d3.select('#pm10Chart').style('margin-top', '20px');
+              d3.select('#realtime-btn').classed('activeBtn', false);
+              d3.select('#historial-btn').classed('activeBtn', false);
+              d3.select('#comparison-btn').classed('activeBtn', true);
+            }
+          });
 
-        $(function() {
+        /*window.onload = function() {
+          
+          document.querySelector('.historical-daterange').daterangepicker();
+          document.querySelector('.compare-daterange').daterangepicker();
+
+          document.querySelector('.historical-daterange').addEventListener('apply.daterangepicker', function(ev, picker) {
+            for(const element of charts){
+              const chart_element = element.querySelector('.chartSvg')
+              console.log(chart_element);
+              chartObj.createComparisonCharts(chart_element);
+            }
+          });
+
+          document.querySelector('.compare-daterange').addEventListener('apply.daterangepicker', function(ev, picker) {
+            for(const element of charts){
+              const chart_element = element.querySelector('.chartSvg')
+              console.log(chart_element);
+              chartObj.createComparisonCharts(chart_element);
+            }
+          });
+        };*/
+
+        /*$(function() {
             $('input[name="historical-daterange"]').daterangepicker();
             $('input[name="compare-daterange"]').daterangepicker();
 
@@ -191,7 +211,7 @@
                     chartObj.createComparisonCharts(chart_element);
                 }
             });
-        });
+        });*/
     </script>
 </body>
 </html>
