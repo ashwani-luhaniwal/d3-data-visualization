@@ -4,6 +4,8 @@ class CoCoCharts {
     this.host = 'http://cocopuff.org';
     this.stationId = '5a5b9886c9310903066bfaa4';
     this.timeFormat = d3.timeParse('%Y-%m-%d %H:%M:%S');
+    this.dateFormat = d3.timeParse('%Y-%m-%d');
+    this.currentDate = new Date();
     
     this.margin = { top: 20, right: 50, bottom: 70, left: 50 };
     this.width = this.element.clientWidth - this.margin.left - this.margin.right;
@@ -11,15 +13,15 @@ class CoCoCharts {
 
     this.x = d3.scaleTime().range([0, this.width]);
     this.y = d3.scaleLinear().range([this.height, 0]);
-
-    // this.formatDay = d3.timeFormat('%d');
-    // this.formatMonth = d3.timeFormat('%B');
-    // this.formatYear = d3.timeFormat('%Y');
-    
-    // this.hourTimeFormat = d3.timeParse('%m-%d %H:%M:%S');
   }
   
   displayChart() {
+    // to test new station data
+    let inputStationId = document.querySelector('input#station').value;
+    if (inputStationId) {
+      this.stationId = inputStationId
+    }
+
     d3.queue()
       .defer(d3.json, this.host + '/station/data/' + this.stationId + '/air_quality')
       .defer(d3.json, this.host + '/station/data/' + this.stationId + '/traffic')
@@ -30,6 +32,14 @@ class CoCoCharts {
         that.globalTrafficData = traffic;
         that.globalHistorical_2015_pm25 = historical_2015_pm25;
 
+        let previousThreeWeeks = new Date(this.currentDate.getTime() - (60 * 24 * 60 * 60 * 1000))
+        // console.log(that.formatCurrentDate(previousThreeWeeks))
+        let currentDay = that.formatCurrentDate(this.currentDate);
+        let nextWeek = new Date(this.currentDate.getTime() + (7 * 24 * 60 * 60 * 1000))
+        // console.log(currentDay);
+        // let n = this.currentDate.getTime() + 7 * 24 * 60 * 60 * 1000;
+        // console.log(that.formatCurrentDate(nextWeek))
+
         let airQualityData = that.removeDuplicates(that.globalAirQuality.air_quality, 'aqi');
         let reverseTrafficData = that.globalTrafficData.traffic.reverse();
         let trafficData = reverseTrafficData.filter(d => {
@@ -38,19 +48,18 @@ class CoCoCharts {
             }
         });
 
-        let initialCoCoPuffData = airQualityData;
-        reverseTrafficData.filter(d => {
-            if (d.created_at) {
-                initialCoCoPuffData.push(d);
-            }
-        });
+        let datesArray = [];
+        for (let i = previousThreeWeeks; i < nextWeek; i++) {
+          datesArray.push(i)
+        }
+        console.log(datesArray)
+        // console.log(airQualityFilter)
 
         var currentAirData = airQualityData.splice(0, 18);
         var currentTrafficData = trafficData.splice(0, 900);
 
         if (currentAirData[0].iaqi.hasOwnProperty('pm10') && that.element.getAttribute('label') == 'pm10') {
           d3.select(that.element.childNodes).remove()
-          // d3.select('svg#' + that.element.getAttribute('label') + '-svg').remove();
           that.createChart(currentAirData, that.element, 'steelblue'); 
         }     
         if (currentAirData[0].iaqi.hasOwnProperty('pm25') && that.element.getAttribute('label') == 'pm25') {
@@ -75,7 +84,9 @@ class CoCoCharts {
   createChart(chartData, element, color) {
     let that = this, 
       drawline,
-      bisectDate = d3.bisector(function(d) { return d.date; }).left;
+      bisectDate = d3.bisector(function(d) { 
+        return that.timeFormat(d.time.s); 
+      }).left;
 
     let line = d3.line()
       .x((d) => { return that.x(d.dateTime); })
@@ -152,105 +163,6 @@ class CoCoCharts {
         .style('stroke', color)
         .attr('d', line);
     }
-
-    var focus = svg.append("g")
-      .attr("class", "focus")
-      .style("display", "none");
-
-    focus.append("circle")
-      .attr("r", 4.5);
-
-    focus.append("text")
-      .attr("x", 9)
-      .attr("dy", ".35em");
-
-    svg.append("rect")
-      .attr("class", "overlay")
-      .attr("width", that.width)
-      .attr("height", that.height)
-      .on("mouseover", function() { focus.style("display", null); })
-      .on("mouseout", function() { focus.style("display", "none"); })
-      .on("mousemove", mousemove);
-
-    function mousemove() {
-      var x0 = that.x.invert(d3.mouse(this)[0]),
-          i = bisectDate(chartData, x0, 1),
-          d0 = chartData[i - 1],
-          d1 = chartData[i];
-          console.log(i);
-          console.log(d0);
-          // d = x0 - d0.date > d1.date - x0 ? d1 : d0;
-      // focus.attr("transform", "translate(" + that.x(d.date) + "," + that.y(d.close) + ")");
-      // focus.select("text").text(formatCurrency(d.close));
-    }
-    
-    /*svg.selectAll("dot")
-      .data(chartData)
-      .enter().append("circle")
-      .attr("r", 2.5)
-      .attr("cx", (d) => { return that.x(d.dateTime); })
-      .attr("cy", (d) => { 
-        if (element.getAttribute('label') == 'pm10') { return that.y(d.pm10); }
-        else if (element.getAttribute('label') == 'pm25') { return that.y(d.pm25); }
-        else if (element.getAttribute('label') == 'no2') { return that.y(d.no2); }
-        else if (element.getAttribute('label') == 'o3') { return that.y(d.o3); } 
-      })
-      .style('fill', color)
-      .on("mouseover", (d) => {
-        if (element.getAttribute('label') == 'pm10') { 
-          div.transition()
-            .duration(100)
-            .style("opacity", 1);
-          div.html(
-            '<p><b>pm<sub>10</sub> Level: </b>' + d.pm10 + ' ug/m<sup>3</sup></p>'
-            + '<p><b>Time: </b>' + that.displayTime(d.time.s) + '</p>'
-            + '<p><b>Date: </b>' + that.displayDate(d.time.s) + '</p>'
-          )
-          .style("left", (d3.event.pageX + 28) + "px")
-          .style("top", (d3.event.pageY - 30) + "px");
-        }
-        else if (element.getAttribute('label') == 'pm25') { 
-          div.transition()
-            .duration(100)
-            .style("opacity", 1);
-          div.html(
-            '<p><b>pm<sub>25</sub> Level: </b>' + d.pm25 + ' ug/m<sup>3</sup></p>'
-            + '<p><b>Time: </b>' + that.displayTime(d.time.s) + '</p>'
-            + '<p><b>Date: </b>' + that.displayDate(d.time.s) + '</p>'
-          )
-          .style("left", (d3.event.pageX + 28) + "px")
-          .style("top", (d3.event.pageY - 30) + "px");
-        }
-        else if (element.getAttribute('label') == 'no2') { 
-          div.transition()
-            .duration(100)
-            .style("opacity", 1);
-          div.html(
-            '<p><b>no<sub>2</sub> Level: </b>' + d.no2 + ' ug/m<sup>3</sup></p>'
-            + '<p><b>Time: </b>' + that.displayTime(d.time.s) + '</p>'
-            + '<p><b>Date: </b>' + that.displayDate(d.time.s) + '</p>'
-          )
-          .style("left", (d3.event.pageX + 28) + "px")
-          .style("top", (d3.event.pageY - 30) + "px");
-        }
-        else if (element.getAttribute('label') == 'o3') {
-          div.transition()
-            .duration(100)
-            .style("opacity", 1);
-          div.html(
-            '<p><b>o<sub>3</sub> Level: </b>' + d.o3 + ' ug/m<sup>3</sup></p>'
-            + '<p><b>Time: </b>' + that.displayTime(d.time.s) + '</p>'
-            + '<p><b>Date: </b>' + that.displayDate(d.time.s) + '</p>'
-          )
-          .style("left", (d3.event.pageX + 28) + "px")
-          .style("top", (d3.event.pageY - 30) + "px");
-        }
-      })
-      .on("mouseout", (d) => {
-        div.transition()
-          .duration(500)
-          .style("opacity", 0);
-      });*/
     
     svg.append('g')
       .attr('transform', 'translate(0, ' + that.height + ')')
@@ -294,5 +206,17 @@ class CoCoCharts {
     let month = new Date(d).getMonth();
     let year = new Date(d).getFullYear();
     return date + ' ' + monthNames[month] + ', ' + year;
+  }
+
+  formatCurrentDate(currentDate) {
+    let year = currentDate.getFullYear();
+    let month = currentDate.getMonth();
+    let date = currentDate.getDate();
+    let hours = currentDate.getHours();
+    let minutes = currentDate.getMinutes();
+    let seconds = currentDate.getSeconds();
+    let formattedDate = year + '-' + ('0' + (month + 1)) + '-' + ((date < 10) ? '0' + date : date);
+    // let formattedTime = ((hours < 10) ? '0' + hours : hours) + ':' + ((minutes < 10) ? '0' + minutes : minutes) + ':' + ((seconds) < 10) ? '0' + seconds : seconds;
+    return formattedDate;
   }
 }
