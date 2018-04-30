@@ -10,7 +10,6 @@
     <script type="text/javascript" src="js/coco-class.js"></script>
 
     <style>
-     
       #panel{
         height:100vh;
         width:400px;
@@ -39,6 +38,15 @@
         position: relative;
         width:100%;
         height:300px;
+      }
+      .overlay {
+        fill: none;
+        pointer-events: all;
+      }
+
+      .focus circle {
+        fill: none;
+        stroke: steelblue;
       }
     </style>
 
@@ -77,6 +85,7 @@
         chart.chartObj.displayChart();
       }
 
+      // For rendering chart for particular station please comment the above for loop code
       function station_id_change(event) {
         const value = event.currentTarget.value
         for(const chart of charts){
